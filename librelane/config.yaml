@@ -28,6 +28,10 @@ meta:
     #Netgen.LVS: null
     #Checker.LVS: null
 
+    OpenROAD.GlobalRouting: null
+    OpenROAD.CheckAntennas: null
+    OpenROAD.RepairDesignPostGRT: OpenROAD.ResizerTimingPostGRT
+
 DESIGN_NAME: chip_top
 VERILOG_FILES:
 - dir::../src/chip_top.sv
@@ -107,7 +111,7 @@ IGNORE_DISCONNECTED_MODULES:
 # Clock
 CLOCK_PORT: clk_PAD
 CLOCK_NET: clk_pad/Y
-CLOCK_PERIOD: 25 # 40 MHz
+CLOCK_PERIOD: 20.8 # 48 MHz
 
 # Overfix hold violations
 PL_RESIZER_HOLD_SLACK_MARGIN: 0.29
@@ -117,6 +121,10 @@ GRT_RESIZER_HOLD_SLACK_MARGIN: 0.25
 # logic on your die
 PL_TARGET_DENSITY_PCT: 50
 GRT_ALLOW_CONGESTION: true
+
+RUN_POST_GRT_RESIZER_TIMING: true
+RUN_POST_GRT_DESIGN_REPAIR: true
+GRT_DESIGN_REPAIR_RUN_GRT: false
 
 #SYNTH_AUTONAME: True
 

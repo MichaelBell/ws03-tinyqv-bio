@@ -57,9 +57,19 @@ module chip_core #(
         .qspi_oe(bidir_oe[7:0]),
         .qspi_pu(bidir_pu[7:0]),
         .qspi_pd(bidir_pd[7:0]),
+        .uart_rx(input_in[0]),
+        .uart_tx(bidir_out[40]),
+        .uart_rts(bidir_out[41]),
         .clk(clk),
         .rst_n(rst_n)
     );
+
+    // TODO
+    assign bidir_out[42] = 1'b0;
+    assign bidir_out[43] = 1'b0;
+    assign bidir_oe[43:40] = '1;
+    assign bidir_pu[43:40] = '0;
+    assign bidir_pd[43:40] = '0;
 
 endmodule
 

@@ -3,13 +3,13 @@ name: CI
 # Events that trigger the workflow
 on:
   # Runs on all pushes to branches
-  push:
-    branches:
-      - "**"
-    tags-ignore:
-      - "**"
+  #push:
+  #  branches:
+  #    - "**"
+  #  tags-ignore:
+  #    - "**"
   # Runs on all PRs
-  pull_request:
+  #pull_request:
   # Manual Dispatch
   workflow_dispatch:
 

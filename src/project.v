@@ -6,7 +6,7 @@
 `default_nettype none
 
 module tinyQV_top #(
-    parameter CLOCK_KHZ=56000,
+    parameter CLOCK_KHZ=48000,
     parameter NUM_GPIO=32
 ) (
     `ifdef USE_POWER_PINS_FOR_RAM
@@ -24,6 +24,9 @@ module tinyQV_top #(
     output wire [7:0] qspi_oe,
     output wire [7:0] qspi_pu,
     output wire [7:0] qspi_pd,
+    input  wire       uart_rx,
+    output wire       uart_tx,
+    output wire       uart_rts,    
     input  wire       clk,
     input  wire       rst_n
 );
@@ -100,9 +103,13 @@ module tinyQV_top #(
     // Peripherals get synchronized ui_in.
     reg [NUM_GPIO-1:0] gpio_in_sync0;
     reg [NUM_GPIO-1:0] gpio_in_sync;
+    reg       uart_rx_sync0;
+    reg       uart_rx_sync;
     always @(posedge clk) begin
         gpio_in_sync0 <= gpio_in;
+        uart_rx_sync0 <= uart_rx;
         gpio_in_sync <= gpio_in_sync0;
+        uart_rx_sync <= uart_rx_sync0;
     end
 
     // Interrupt requests
@@ -200,6 +207,10 @@ module tinyQV_top #(
         .gpio_oe(peri_gpio_oe),
         .gpio_pu(gpio_pu),
         .gpio_pd(gpio_pd),
+
+        .uart_rx(uart_rx_sync),
+        .uart_tx(uart_tx),
+        .uart_rts(uart_rts),
 
         .addr_in(addr[10:0]),
         .data_in(data_to_write),

@@ -16,6 +16,7 @@ module tqvp_uart_wrapper #(
 
     input  [NUM_GPIO-1:0]  ui_in,        // The input PMOD, always available.  Note that ui_in[7] is normally used for UART RX.
                                 // The inputs are synchronized to the clock, note this will introduce 2 cycles of delay on the inputs.
+    input         uart_rx,
 
     output [NUM_GPIO-1:0]  uo_out,       // The output PMOD.  Each wire is only connected if this peripheral is selected.
                                 // Note that uo_out[0] is normally used for UART TX.
@@ -50,7 +51,7 @@ module tqvp_uart_wrapper #(
     reg [1:0] rxd_select;
     always @(posedge clk) begin
         if (!rst_n) begin
-            rxd_select <= 0;
+            rxd_select <= 2'b10;
         end else begin
             if (address == 6'hc) begin
                 if (data_write_n != 2'b11) rxd_select <= data_in[1:0];
@@ -80,9 +81,13 @@ module tqvp_uart_wrapper #(
 
     wire uart_rx_valid;
     wire [7:0] uart_rx_data;
-    wire uart_rxd = rxd_select[1] ? ui_in[3] :
+    wire uart_rxd = rxd_select[1] ? uart_rx :
                     rxd_select[0] ? ui_in[2] : ui_in[1];
     wire uart_rts;
+
+    // Buffer one byte of received data
+    reg uart_rx_buffered;
+    reg [7:0] uart_rx_buf_data;
 
     tqvp_uart_rx i_uart_rx(
         .clk(clk),
@@ -94,10 +99,6 @@ module tqvp_uart_wrapper #(
         .uart_rx_data(uart_rx_data),
         .baud_divider(baud_divider) 
     );
-
-    // Buffer one byte of received data
-    reg uart_rx_buffered;
-    reg [7:0] uart_rx_buf_data;
 
     always @(posedge clk) begin
         if (!rst_n) begin
@@ -124,6 +125,6 @@ module tqvp_uart_wrapper #(
 
     assign uo_out = {NUM_GPIO/2{uart_rts, uart_txd}};
 
-    wire _unused = &{data_in[31:8], 1'b0};
+    wire _unused = &{data_in[31:8], ui_in[NUM_GPIO-1:3], ui_in[0], 1'b0};
 
 endmodule
