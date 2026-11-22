@@ -32,6 +32,10 @@ DESIGN_NAME: chip_top
 VERILOG_FILES:
 - dir::../src/chip_top.sv
 - dir::../src/chip_core.sv
+- dir::../src/femto-bio/femto_bio_top.v
+- dir::../src/femto-bio/femto_bio_core.v
+- dir::../src/femto-bio/femto_quark_bi.v
+- dir::../src/femto-bio/femto_ram.v
 
 # Enable plugin for better SystemVerilog support
 # USE_SLANG: True
@@ -72,8 +76,10 @@ GRT_RESIZER_HOLD_SLACK_MARGIN: 0.3
 
 # Increase density for more 
 # logic on your die
-PL_TARGET_DENSITY_PCT: 35
+PL_TARGET_DENSITY_PCT: 60
 GRT_ALLOW_CONGESTION: true
+
+SYNTH_AUTONAME: True
 
 # Allow a larger Y displacement
 PL_MAX_DISPLACEMENT_Y: 200

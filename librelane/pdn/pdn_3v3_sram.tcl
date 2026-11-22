@@ -2,7 +2,7 @@
 
 define_pdn_grid \
     -macro \
-    -instances i_chip_core.sram_0 \
+    -instances i_chip_core.i_bio.i_femto_bio_core.i_femtoram.i_ram.sram_0 \
     -name sram_macros_NS \
     -starts_with POWER \
     -halo "$::env(PDN_HORIZONTAL_HALO) $::env(PDN_VERTICAL_HALO)"
@@ -40,7 +40,7 @@ add_pdn_stripe \
 
 define_pdn_grid \
     -macro \
-    -instances i_chip_core.sram_1 \
+    -instances i_chip_core.i_bio.i_femto_bio_core.i_femtoram.i_ram.sram_1 \
     -name sram_macros_WE \
     -starts_with POWER \
     -halo "$::env(PDN_HORIZONTAL_HALO) $::env(PDN_VERTICAL_HALO)"

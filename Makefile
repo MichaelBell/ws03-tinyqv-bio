@@ -18,7 +18,7 @@ PDK_COMMIT ?= 2fdf40d5736413bb321c31418462aefc17b919b8
 ifeq ($(SCL),default)
     SCL = gf180mcu_fd_sc_mcu7t5v0
 endif
-SCL ?= gf180mcu_fd_sc_mcu7t5v0
+SCL ?= gf180mcu_as_sc_mcu7t3v3
 
 # Available PAD libraries:
 # gf180mcu_fd_io
@@ -36,7 +36,7 @@ PAD ?= gf180mcu_fd_io
 ifeq ($(SRAM),default)
     SRAM = gf180mcu_fd_ip_sram
 endif
-SRAM ?= gf180mcu_fd_ip_sram
+SRAM ?= gf180mcu_ocd_ip_sram
 
 ifeq ($(SRAM),gf180mcu_fd_ip_sram)
     MACROS = 5v
@@ -45,7 +45,7 @@ else
 endif
 
 AVAILABLE_SLOTS = 1x1 0p5x1 1x0p5 0p5x0p5
-DEFAULT_SLOT = 1x1
+DEFAULT_SLOT = 0p5x0p5
 
 # Slot can be any of AVAILABLE_SLOTS
 SLOT ?= $(DEFAULT_SLOT)
@@ -100,7 +100,7 @@ librelane-condensed: clone-pdk defines ## Run LibreLane flow (synthesis, PnR, ve
 .PHONY: librelane-condensed
 
 librelane-nodrc: clone-pdk defines ## Run LibreLane flow without DRC checks
-	SRAM_DEFINE=${SRAM_DEFINE} librelane ${LIBRELANE_CONFIGS} ${LIBRELANE_OPTS} --save-views-to $(MAKEFILE_DIR)/final --skip KLayout.Antenna --skip KLayout.DRC --skip Magic.DRC
+	SRAM_DEFINE=${SRAM_DEFINE} librelane ${LIBRELANE_CONFIGS} ${LIBRELANE_OPTS} --save-views-to $(MAKEFILE_DIR)/final --skip KLayout.Antenna --skip KLayout.DRC --skip Magic.DRC --skip KLayout.Density
 .PHONY: librelane-nodrc
 
 librelane-klayoutdrc: clone-pdk defines ## Run LibreLane flow without magic DRC checks

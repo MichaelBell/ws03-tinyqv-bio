@@ -39,63 +39,27 @@ module chip_core #(
     assign input_pd = '0;
 
     // Set the bidir as output
-    assign bidir_oe = '1;
     assign bidir_cs = '0;
     assign bidir_sl = '0;
     assign bidir_ie = ~bidir_oe;
     assign bidir_pu = '0;
     assign bidir_pd = '0;
     
-    logic _unused;
-    assign _unused = &bidir_in;
-
-    logic [NUM_BIDIR_PADS-1:0] count;
-
-    always_ff @(posedge clk) begin
-        if (!rst_n) begin
-            count <= '0;
-        end else begin
-            if (&input_in) begin
-                count <= count + 1;
-            end
-        end
-    end
-
-    logic [7:0] sram_0_out;
-
-    `gf180mcu_xxx_ip_sram__sram512x8m8wm1 sram_0 (
+    femto_bio i_bio(
         `ifdef USE_POWER_PINS
         .VDD  (VDD),
         .VSS  (VSS),
         `endif
 
-        .CLK  (clk),
-        .CEN  (1'b1),
-        .GWEN (1'b0),
-        .WEN  (8'b0),
-        .A    ('0),
-        .D    ('0),
-        .Q    (sram_0_out)
+        .clk(clk),
+        .rst_n(rst_n),
+        .gpio_out(bidir_out[31:0]),
+        .gpio_oe(bidir_oe[31:0]),
+        .gpio_in(bidir_in[31:0])
     );
 
-    logic [7:0] sram_1_out;
-
-    `gf180mcu_xxx_ip_sram__sram512x8m8wm1 sram_1 (
-        `ifdef USE_POWER_PINS
-        .VDD  (VDD),
-        .VSS  (VSS),
-        `endif
-
-        .CLK  (clk),
-        .CEN  (1'b1),
-        .GWEN (1'b0),
-        .WEN  (8'b0),
-        .A    ('0),
-        .D    ('0),
-        .Q    (sram_1_out)
-    );
-
-    assign bidir_out = count ^ {24'd0, sram_0_out, sram_1_out};
+    assign bidir_out[37:32] = '0;
+    assign bidir_oe[37:32] = '0;
 
 endmodule
 
