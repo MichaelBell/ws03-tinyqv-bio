@@ -40,7 +40,7 @@ add_pdn_stripe \
 
 define_pdn_grid \
     -macro \
-    -instances {i_chip_core.tt.i_bio.*.i_femto_bio_core.i_femtoram.i_ram.sram_0 i_chip_core.tt.i_bio.*.i_femto_bio_core.i_femtoram.i_ram.sram_1} \
+    -instances {i_chip_core.tt.i_bio.*.i_femto_bio_core.i_femtoram.i_ram.genblk1.sram_0 i_chip_core.tt.i_bio.*.i_femto_bio_core.i_femtoram.i_ram.genblk1.sram_1} \
     -name sram_macros_WE \
     -starts_with POWER \
     -halo "$::env(PDN_HORIZONTAL_HALO) $::env(PDN_VERTICAL_HALO)"
@@ -60,8 +60,18 @@ add_pdn_stripe \
     -width 1.36 \
     -offset 0.68 \
     -spacing 0.28 \
-    -pitch 319.09 \
+    -pitch 512.81 \
     -starts_with POWER \
+    -number_of_straps 1
+
+add_pdn_stripe \
+    -grid sram_macros_WE \
+    -layer Metal4 \
+    -width 1.36 \
+    -offset 508.49 \
+    -spacing 0.28 \
+    -pitch 5.0 \
+    -starts_with GROUND \
     -number_of_straps 2
 
 # Since the above stripes block the top level PDN at Metal4, add some more stripes
@@ -72,6 +82,6 @@ add_pdn_stripe \
     -width 4.00 \
     -offset 28.0 \
     -spacing 0.28 \
-    -pitch 43.50 \
+    -pitch 45.98 \
     -starts_with GROUND \
-    -number_of_straps 7
+    -number_of_straps 11

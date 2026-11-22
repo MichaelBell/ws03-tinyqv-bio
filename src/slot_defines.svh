@@ -12,6 +12,8 @@
 `define NUM_BIDIR_PADS 44
 `define NUM_ANALOG_PADS 2
 
+`define NUM_BIO_CORES 4
+
 `endif
 
 `ifdef SLOT_0P5X1
@@ -28,6 +30,8 @@
 `define NUM_BIDIR_PADS 44
 `define NUM_ANALOG_PADS 6
 
+`define NUM_BIO_CORES 3
+
 `endif
 
 `ifdef SLOT_1X0P5
@@ -40,9 +44,11 @@
 `define NUM_VSS_PADS 1
 
 // Signal pads
-`define NUM_INPUT_PADS 4
-`define NUM_BIDIR_PADS 46
+`define NUM_INPUT_PADS 6
+`define NUM_BIDIR_PADS 44
 `define NUM_ANALOG_PADS 4
+
+`define NUM_BIO_CORES 3
 
 `endif
 

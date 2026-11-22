@@ -3,7 +3,7 @@ MAKEFILE_DIR := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 RUN_TAG = $(shell ls librelane/runs/ | tail -n 1)
 TOP = chip_top
 
-PDK_ROOT ?= $(MAKEFILE_DIR)/gf180mcu
+PDK_ROOT = $(MAKEFILE_DIR)/gf180mcu
 PDK ?= gf180mcuD
 PDK_COMMIT ?= 2fdf40d5736413bb321c31418462aefc17b919b8
 
@@ -78,6 +78,8 @@ all: librelane ## Build the project (runs LibreLane)
 
 $(PDK_ROOT)/ciel/gf180mcu/versions/$(PDK_COMMIT)/$(PDK):
 	ciel enable $(PDK_COMMIT) --pdk-root $(PDK_ROOT) --pdk $(PDK) --include-libraries all
+	sed -i 's/GF018hv5v_mcu_sc7/unithd/' $(PDK_ROOT)/ciel/gf180mcu/versions/$(PDK_COMMIT)/$(PDK)/libs.ref/gf180mcu_fd_sc_mcu7t5v0/lef/gf180mcu_fd_sc_mcu7t5v0.lef
+	sed -i 's/GF018hv5v_mcu_sc7/unithd/' $(PDK_ROOT)/ciel/gf180mcu/versions/$(PDK_COMMIT)/$(PDK)/libs.ref/gf180mcu_fd_sc_mcu7t5v0/techlef/*
 
 clone-pdk: $(PDK_ROOT)/ciel/gf180mcu/versions/$(PDK_COMMIT)/$(PDK) ## Clone the gf180mcu PDK
 .PHONY: clone-pdk
@@ -100,7 +102,7 @@ librelane-condensed: clone-pdk defines ## Run LibreLane flow (synthesis, PnR, ve
 .PHONY: librelane-condensed
 
 librelane-nodrc: clone-pdk defines ## Run LibreLane flow without DRC checks
-	SRAM_DEFINE=${SRAM_DEFINE} librelane ${LIBRELANE_CONFIGS} ${LIBRELANE_OPTS} --save-views-to $(MAKEFILE_DIR)/final --skip KLayout.Antenna --skip KLayout.DRC --skip Magic.DRC --skip KLayout.Density --skip OpenROAD.IRDropReport
+	SRAM_DEFINE=${SRAM_DEFINE} librelane ${LIBRELANE_CONFIGS} ${LIBRELANE_OPTS} --save-views-to $(MAKEFILE_DIR)/final --skip KLayout.Antenna --skip KLayout.DRC --skip Magic.DRC --skip KLayout.Density --skip OpenROAD.IRDropReport --to OpenROAD.GlobalPlacement
 .PHONY: librelane-nodrc
 
 librelane-klayoutdrc: clone-pdk defines ## Run LibreLane flow without magic DRC checks
@@ -122,6 +124,10 @@ librelane-klayout: clone-pdk defines ## Open the last run in KLayout
 librelane-floorplan: clone-pdk defines ## Open the last run in KLayout
 	SRAM_DEFINE=${SRAM_DEFINE} librelane ${LIBRELANE_CONFIGS} ${LIBRELANE_OPTS} --last-run --from OpenROAD.Floorplan
 .PHONY: librelane-floorplan
+
+librelane-pdn: clone-pdk defines ## Open the last run in KLayout
+	SRAM_DEFINE=${SRAM_DEFINE} librelane ${LIBRELANE_CONFIGS} ${LIBRELANE_OPTS} --last-run --from OpenROAD.GeneratePDN
+.PHONY: librelane-pdn
 
 librelane-padring: clone-pdk defines ## Only create the padring
 	python3 scripts/padring.py ${LIBRELANE_CONFIGS} ${LIBRELANE_OPTS}
