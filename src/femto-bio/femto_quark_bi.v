@@ -35,7 +35,7 @@
 `define NRV_ABI      "ilp32"
 `define NRV_OPTIMIZE "-Os"
 
-module FemtoRV32 #(parameter ADDR_WIDTH=10) (
+module FemtoRV32 #(parameter PC_WIDTH=10) (
    input         clk,
    input         resetn,     // set to 0 to reset the processor
 
@@ -66,7 +66,7 @@ module FemtoRV32 #(parameter ADDR_WIDTH=10) (
 );
 
    parameter RESET_ADDR       = 0;
-   parameter PC_WIDTH         = ADDR_WIDTH;
+   parameter ADDR_WIDTH       = 32;
 
    /***************************************************************************/
    // Instruction decoding.
@@ -115,13 +115,21 @@ module FemtoRV32 #(parameter ADDR_WIDTH=10) (
 
    reg [31:0] rs1;
    reg [31:0] rs2;
-   reg [31:0] registerFile [15:0];
 
-   always @(posedge clk) begin
-     if (writeBack & ~rd_id[4])
-       if (rd_id != 0)
-         registerFile[rd_id[3:0]] <= rd_wdata;
-   end
+   wire [31:0] rs1_reg_data;
+   wire [31:0] rs2_reg_data;
+   
+   femto_reg_file i_reg_file (
+       .clk(clk),
+       .rst_n(resetn),
+       .rs1_id(rs1_id[3:0]),
+       .rs2_id(rs2_id[3:0]),
+       .rd_id(rd_id[3:0]),
+       .rd_wdata(rd_wdata),
+       .we(writeBack & ~rd_id[4]),
+       .rs1(rs1_reg_data),
+       .rs2(rs2_reg_data)
+   );
 
    /***************************************************************************/
    // The ALU. Does operations and tests combinatorially, except shifts.
@@ -199,9 +207,9 @@ module FemtoRV32 #(parameter ADDR_WIDTH=10) (
       aluIn1[ 0], aluIn1[ 1], aluIn1[ 2], aluIn1[ 3], aluIn1[ 4], aluIn1[ 5],
       aluIn1[ 6], aluIn1[ 7]};
 
-   wire [31:0] rev = (instr[23] & instr[20]) ? bit_rev :
-                     instr[20] ? bit_rev_in_bytes : byte_rev;
-   wire use_rev = isALUimm & instr[27];
+   wire [31:0] rev = (instr[23] & ~instr[20]) ? byte_rev :
+                     (~instr[23] & instr[20]) ? bit_rev_in_bytes : bit_rev;
+   wire use_rev = (isALUimm & instr[27]) | funct3Is[1];
 
    /***************************************************************************/
 
@@ -251,26 +259,24 @@ module FemtoRV32 #(parameter ADDR_WIDTH=10) (
    wire [31:0] debug_instr = {instr, 2'b11};
 `endif
 
-   wire [PC_WIDTH-1:0] PCplus4 = PC + 4;
+   /* verilator lint_off WIDTH */
+   wire [PC_WIDTH-1:0] PCplus4 = {PC[PC_WIDTH-1:2] + 30'd1, 2'b00};
 
-   // Branch address comes from the adder
-   wire [PC_WIDTH-1:0] PCplusImm = PC + ( instr[3] ? Jimm[PC_WIDTH-1:0] :
-                                          instr[4] ? Uimm[PC_WIDTH-1:0] :
-                                                     Bimm[PC_WIDTH-1:0] );
+   // Branch address comes from the adder, adder must be full width for AUIPC
+   wire [31:0] PCplusImm = PC + ( instr[3] ? Jimm :
+                                  instr[4] ? Uimm :
+                                             Bimm );
 
    // Destination of load/store comes from the adder
    wire [ADDR_WIDTH-1:0] loadstore_addr = aluPlus[ADDR_WIDTH-1:0];
 
-   /* verilator lint_off WIDTH */
-   // internal address registers and cycles counter may have less than
-   // 32 bits, so we deactivate width test for mem_addr and writeBackData
-
    wire [PC_WIDTH-1:0] PC_new =
-      isJALR           ? {aluPlus[PC_WIDTH-1:1],1'b0} :
-      jumpToPCplusImm  ? PCplusImm :
+      isJALR           ? {aluPlus[PC_WIDTH-1:2],2'b00} :  // Force restrict PC to be a multiple of 4
+      jumpToPCplusImm  ? {PCplusImm[PC_WIDTH-1:2],2'b00} :
                          PCplus4;
 
-   assign mem_addr = state[WAIT_INSTR_bit] | state[FETCH_INSTR_bit] ? PC     :
+   assign mem_addr = state[WAIT_INSTR_bit] | state[FETCH_INSTR_bit] |
+                     (state[WAIT_ALU_OR_MEM_bit] & ~isLoad & ~isStore) ? PC  :
                      state[EXECUTE_bit] & ~isLoad & ~isStore        ? PC_new :
                                                               loadstore_addr ;
 
@@ -370,7 +376,7 @@ module FemtoRV32 #(parameter ADDR_WIDTH=10) (
 
    // The memory transaction activate signals.
    assign mem_rstrb = (state[EXECUTE_bit] & ~isStore) | state[FETCH_INSTR_bit];
-   assign mem_rinstr = (state[EXECUTE_bit] & ~isStore & ~isLoad) | state[FETCH_INSTR_bit] | state[WAIT_INSTR_bit];
+   assign mem_rinstr = ((state[EXECUTE_bit] | state[WAIT_ALU_OR_MEM_bit]) & ~isStore & ~isLoad) | state[FETCH_INSTR_bit] | state[WAIT_INSTR_bit];
    assign mem_wstrb = state[EXECUTE_bit] & isStore;
 
    // The mask for memory.
@@ -413,7 +419,7 @@ module FemtoRV32 #(parameter ADDR_WIDTH=10) (
       if(!resetn) begin
          state      <= WAIT_ALU_OR_MEM; // Just waiting for !mem_wbusy
          PC         <= RESET_ADDR[PC_WIDTH-1:0];
-         instr      <= 30'd1;  // Invalid op with rd=0, which will set rd to 0.
+         instr      <= 30'b01000;  // Dummy store to force transition through FETCH_INSTR
       end else begin
 
       // See note [1] at the end of this file.
@@ -422,8 +428,8 @@ module FemtoRV32 #(parameter ADDR_WIDTH=10) (
 
          state[WAIT_INSTR_bit]: begin
             if (!mem_rbusy && !reg_rbusy) begin // may be high when executing from SPI flash
-               rs1 <= rs1_id[4] ? rs1_rdata : registerFile[rs1_id[3:0]];
-               rs2 <= rs2_id[4] ? rs2_rdata : registerFile[rs2_id[3:0]];
+               rs1 <= rs1_id[4] ? rs1_rdata : rs1_reg_data;
+               rs2 <= rs2_id[4] ? rs2_rdata : rs2_reg_data;
                instr <= mem_rdata[31:2]; // Bits 0 and 1 are ignored (see
                state <= EXECUTE;         // also the declaration of instr).
             end
@@ -435,7 +441,10 @@ module FemtoRV32 #(parameter ADDR_WIDTH=10) (
          end
 
          state[WAIT_ALU_OR_MEM_bit]: begin
-            if(!mem_rbusy & !mem_wbusy) state <= FETCH_INSTR;
+            if(!mem_rbusy & !mem_wbusy & !reg_wbusy) begin
+               if (isLoad | isStore) state <= FETCH_INSTR;
+               else state <= WAIT_INSTR;
+            end
          end
 
          default: begin // FETCH_INSTR
@@ -445,12 +454,6 @@ module FemtoRV32 #(parameter ADDR_WIDTH=10) (
       endcase
       end
    end
-
-    integer i;
-    initial begin
-        for (i = 0; i < 32; i = i + 1)
-            registerFile[i] = 0;
-    end
 
 endmodule
 

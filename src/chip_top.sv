@@ -46,9 +46,9 @@ module chip_top #(
     parameter NUM_BIDIR_PADS = `NUM_BIDIR_PADS,
     parameter NUM_ANALOG_PADS = `NUM_ANALOG_PADS
     )(
-    `ifdef USE_POWER_PINS
     inout  wire VDD,
     inout  wire VSS,
+    `ifdef USE_POWER_PINS
     inout  wire DVDD,
     inout  wire DVSS,
     `endif
@@ -237,10 +237,8 @@ module chip_top #(
         .NUM_BIDIR_PADS  (NUM_BIDIR_PADS),
         .NUM_ANALOG_PADS (NUM_ANALOG_PADS)
     ) i_chip_core (
-        `ifdef USE_POWER_PINS
         .VDD        (VDD),
         .VSS        (VSS),
-        `endif
     
         .clk        (clk_PAD2CORE),
         .rst_n      (rst_n_PAD2CORE),

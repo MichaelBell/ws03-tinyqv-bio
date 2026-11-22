@@ -32,10 +32,49 @@ DESIGN_NAME: chip_top
 VERILOG_FILES:
 - dir::../src/chip_top.sv
 - dir::../src/chip_core.sv
+- dir::../src/femto-bio/femto_reg_file.v
 - dir::../src/femto-bio/femto_bio_top.v
 - dir::../src/femto-bio/femto_bio_core.v
 - dir::../src/femto-bio/femto_quark_bi.v
 - dir::../src/femto-bio/femto_ram.v
+- dir::../src/femto-bio/femto_ram_mux.v
+- dir::../src/femto-bio/pio_divider.v
+- dir::../src/femto-bio/regfifo.v
+- dir::../src/tinyQV/cpu/tinyqv.v
+- dir::../src/tinyQV/cpu/alu.v
+- dir::../src/tinyQV/cpu/buffer.v
+- dir::../src/tinyQV/cpu/core.v
+- dir::../src/tinyQV/cpu/counter.v
+- dir::../src/tinyQV/cpu/cpu.v
+- dir::../src/tinyQV/cpu/decode.v
+- dir::../src/tinyQV/cpu/mem_ctrl.v
+- dir::../src/tinyQV/cpu/qspi_ctrl.v
+- dir::../src/tinyQV/cpu/qspi_setup.v
+- dir::../src/tinyQV/cpu/register.v
+- dir::../src/tinyQV/cpu/latch_reg.v
+- dir::../src/tinyQV/cpu/time.v
+- dir::../src/tinyQV/cpu/internal_ram.v
+- dir::../src/tinyQV/peri/uart/uart_tx.v
+- dir::../src/project.v
+- dir::../src/peripherals.v
+- dir::../src/peri_byte_empty.v
+- dir::../src/peri_full_empty.v
+- dir::../src/user_peripherals/uart/peri_uart.v
+- dir::../src/user_peripherals/uart/uart_rx.v
+- dir::../src/user_peripherals/uart/uart_tx.v
+- dir::../src/user_peripherals/spi.v
+- dir::../src/user_peripherals/matt_pwm/matt_pwm.v
+- dir::../src/user_peripherals/matt_pwm/pwm_strobe_gen.v
+- dir::../src/user_peripherals/matt_pwm/pwm.v
+- dir::../src/user_peripherals/usbcdc/peripheral.v
+- dir::../src/user_peripherals/usbcdc/bulk_endp.v
+- dir::../src/user_peripherals/usbcdc/ctrl_endp.v
+- dir::../src/user_peripherals/usbcdc/in_fifo.v
+- dir::../src/user_peripherals/usbcdc/out_fifo.v
+- dir::../src/user_peripherals/usbcdc/phy_rx.v
+- dir::../src/user_peripherals/usbcdc/phy_tx.v
+- dir::../src/user_peripherals/usbcdc/sie.v
+- dir::../src/user_peripherals/usbcdc/usb_cdc.v
 
 # Enable plugin for better SystemVerilog support
 # USE_SLANG: True
@@ -68,11 +107,11 @@ IGNORE_DISCONNECTED_MODULES:
 # Clock
 CLOCK_PORT: clk_PAD
 CLOCK_NET: clk_pad/Y
-CLOCK_PERIOD: 40 # 25 MHz
+CLOCK_PERIOD: 25 # 40 MHz
 
 # Overfix hold violations
-PL_RESIZER_HOLD_SLACK_MARGIN: 0.35
-GRT_RESIZER_HOLD_SLACK_MARGIN: 0.3
+PL_RESIZER_HOLD_SLACK_MARGIN: 0.29
+GRT_RESIZER_HOLD_SLACK_MARGIN: 0.25
 
 # Increase density for more 
 # logic on your die
@@ -186,3 +225,33 @@ KLAYOUT_ANTENNA_OPTIONS:
   decks: "antenna"
   variant: ref::$PDK
   workers: max
+
+LIB:
+  "*_tt_025C_3v30":
+    - pdk_dir::libs.ref/gf180mcu_as_sc_mcu7t3v3/lib/gf180mcu_as_sc_mcu7t3v3__tt_025C_3v30.lib
+    - pdk_dir::libs.ref/gf180mcu_fd_sc_mcu7t5v0/lib/gf180mcu_fd_sc_mcu7t5v0__tt_025C_3v30.lib
+  "*_ff_n40C_3v60":
+    - pdk_dir::libs.ref/gf180mcu_as_sc_mcu7t3v3/lib/gf180mcu_as_sc_mcu7t3v3__ff_n40C_3v60.lib
+    - pdk_dir::libs.ref/gf180mcu_fd_sc_mcu7t5v0/lib/gf180mcu_fd_sc_mcu7t5v0__ff_n40C_3v60.lib
+  "*_ss_125C_3v00":
+    - pdk_dir::libs.ref/gf180mcu_as_sc_mcu7t3v3/lib/gf180mcu_as_sc_mcu7t3v3__ss_125C_3v00.lib
+    - pdk_dir::libs.ref/gf180mcu_fd_sc_mcu7t5v0/lib/gf180mcu_fd_sc_mcu7t5v0__ss_125C_3v00.lib
+
+CELL_LEFS:
+  - pdk_dir::libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef
+  - pdk_dir::libs.ref/gf180mcu_fd_sc_mcu7t5v0/lef/gf180mcu_fd_sc_mcu7t5v0.lef
+
+CELL_GDS:
+  - pdk_dir::libs.ref/gf180mcu_as_sc_mcu7t3v3/gds/gf180mcu_as_sc_mcu7t3v3.gds
+  - pdk_dir::libs.ref/gf180mcu_fd_sc_mcu7t5v0/gds/gf180mcu_fd_sc_mcu7t5v0.gds
+
+CELL_VERILOG_MODELS:
+  - pdk_dir::libs.ref/gf180mcu_as_sc_mcu7t3v3/verilog/gf180mcu_as_sc_mcu7t3v3.v
+  - pdk_dir::libs.ref/gf180mcu_fd_sc_mcu7t5v0/verilog/gf180mcu_fd_sc_mcu7t5v0.v
+
+SYNTH_READ_BLACKBOX_LIB: true
+
+EXTRA_EXCLUDED_CELLS:
+  - "gf180mcu_fd_sc_mcu7t5v0__*"
+
+#VERILOG_DEFINES: ["USE_POWER_PINS_FOR_RAM"]

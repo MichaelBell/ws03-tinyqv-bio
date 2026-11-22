@@ -8,10 +8,8 @@ module chip_core #(
     parameter NUM_BIDIR_PADS,
     parameter NUM_ANALOG_PADS
     )(
-    `ifdef USE_POWER_PINS
     inout  wire VDD,
     inout  wire VSS,
-    `endif
     
     input  wire clk,       // clock
     input  wire rst_n,     // reset (active low)
@@ -41,25 +39,27 @@ module chip_core #(
     // Set the bidir as output
     assign bidir_cs = '0;
     assign bidir_sl = '0;
-    assign bidir_ie = ~bidir_oe;
-    assign bidir_pu = '0;
-    assign bidir_pd = '0;
+    assign bidir_ie = '1;
     
-    femto_bio i_bio(
-        `ifdef USE_POWER_PINS
+    tinyQV_top tt(
+        `ifdef USE_POWER_PINS_FOR_RAM
         .VDD  (VDD),
         .VSS  (VSS),
         `endif
 
+        .gpio_in(bidir_in[39:8]),
+        .gpio_out(bidir_out[39:8]),
+        .gpio_oe(bidir_oe[39:8]),
+        .gpio_pu(bidir_pu[39:8]),
+        .gpio_pd(bidir_pd[39:8]),
+        .qspi_in(bidir_in[7:0]),
+        .qspi_out(bidir_out[7:0]),
+        .qspi_oe(bidir_oe[7:0]),
+        .qspi_pu(bidir_pu[7:0]),
+        .qspi_pd(bidir_pd[7:0]),
         .clk(clk),
-        .rst_n(rst_n),
-        .gpio_out(bidir_out[31:0]),
-        .gpio_oe(bidir_oe[31:0]),
-        .gpio_in(bidir_in[31:0])
+        .rst_n(rst_n)
     );
-
-    assign bidir_out[37:32] = '0;
-    assign bidir_oe[37:32] = '0;
 
 endmodule
 
