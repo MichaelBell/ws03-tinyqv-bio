@@ -8,9 +8,9 @@
 `define NUM_VSS_PADS 2
 
 // Signal pads
-`define NUM_INPUT_PADS 8
-`define NUM_BIDIR_PADS 44
-`define NUM_ANALOG_PADS 2
+`define NUM_INPUT_PADS 4
+`define NUM_BIDIR_PADS 50
+`define NUM_ANALOG_PADS 0
 
 `define NUM_BIO_CORES 4
 
@@ -27,8 +27,8 @@
 
 // Signal pads
 `define NUM_INPUT_PADS 4
-`define NUM_BIDIR_PADS 44
-`define NUM_ANALOG_PADS 6
+`define NUM_BIDIR_PADS 50
+`define NUM_ANALOG_PADS 0
 
 `define NUM_BIO_CORES 3
 
@@ -44,9 +44,9 @@
 `define NUM_VSS_PADS 1
 
 // Signal pads
-`define NUM_INPUT_PADS 6
-`define NUM_BIDIR_PADS 44
-`define NUM_ANALOG_PADS 4
+`define NUM_INPUT_PADS 4
+`define NUM_BIDIR_PADS 50
+`define NUM_ANALOG_PADS 0
 
 `define NUM_BIO_CORES 3
 
@@ -62,8 +62,8 @@
 `define NUM_VSS_PADS 1
 
 // Signal pads
-`define NUM_INPUT_PADS 4
-`define NUM_BIDIR_PADS 40
-`define NUM_ANALOG_PADS 2
+`define NUM_INPUT_PADS 1
+`define NUM_BIDIR_PADS 45
+`define NUM_ANALOG_PADS 0
 
 `endif

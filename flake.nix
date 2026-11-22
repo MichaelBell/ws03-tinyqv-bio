@@ -34,6 +34,23 @@
             nix-eda.overlays.default
             devshell.overlays.default
             librelane.overlays.default
+
+
+            (final: prev: {
+              iverilog = prev.iverilog.overrideAttrs (old: {
+                version = "fix-decl-after-use";
+
+                src = prev.fetchFromGitHub {
+                  owner = "MichaelBell";
+                  repo = "iverilog";
+
+                  # commit containing the fix you need
+                  rev = "fbac730f5062ccee37345d87a7995b7594d52cd8";
+
+                  hash = "sha256-Jd77iW5sJarIrcfkKySUMgXMDZhH5vf/XW9YqpuQ+94=";
+                };
+              });
+            })
           ];
         }
       );
@@ -74,6 +91,7 @@
                 # (cocotb is only supported on some platforms due to ghdl-bin:
                 # https://github.com/fossi-foundation/nix-eda/blob/main/nix/ghdl-bin.toml)
                 cocotb
+                riscv-model
               ];
           });
         }

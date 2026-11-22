@@ -5,8 +5,7 @@
 
 module chip_core #(
     parameter NUM_INPUT_PADS,
-    parameter NUM_BIDIR_PADS,
-    parameter NUM_ANALOG_PADS
+    parameter NUM_BIDIR_PADS
     )(
     inout  wire VDD,
     inout  wire VSS,
@@ -25,9 +24,7 @@ module chip_core #(
     output wire [NUM_BIDIR_PADS-1:0] bidir_sl,   // Slew rate (0=fast, 1=slow)
     output wire [NUM_BIDIR_PADS-1:0] bidir_ie,   // Input enable
     output wire [NUM_BIDIR_PADS-1:0] bidir_pu,   // Pull-up
-    output wire [NUM_BIDIR_PADS-1:0] bidir_pd,   // Pull-down
-
-    inout  wire [NUM_ANALOG_PADS-1:0] analog  // Analog
+    output wire [NUM_BIDIR_PADS-1:0] bidir_pd
 );
 
     // See here for usage: https://gf180mcu-pdk.readthedocs.io/en/latest/IPs/IO/gf180mcu_fd_io/digital.html
@@ -65,11 +62,10 @@ module chip_core #(
     );
 
     // TODO
-    assign bidir_out[42] = 1'b0;
-    assign bidir_out[43] = 1'b0;
-    assign bidir_oe[43:40] = '1;
-    assign bidir_pu[43:40] = '0;
-    assign bidir_pd[43:40] = '0;
+    assign bidir_out[NUM_BIDIR_PADS-1:42] = 1'b0;
+    assign bidir_oe[NUM_BIDIR_PADS-1:40] = '1;
+    assign bidir_pu[NUM_BIDIR_PADS-1:40] = '0;
+    assign bidir_pd[NUM_BIDIR_PADS-1:40] = '0;
 
 endmodule
 
