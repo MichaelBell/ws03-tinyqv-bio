@@ -202,7 +202,7 @@ module tinyQV_top #(
         .user_interrupts(peri_interrupts)
     );
 
-    femto_bio i_bio (
+    femto_bio #(.NUM_CORES(4)) i_bio (
         `ifdef USE_POWER_PINS_FOR_RAM
         .VDD  (VDD),
         .VSS  (VSS),
