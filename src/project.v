@@ -26,7 +26,8 @@ module tinyQV_top #(
     output wire [7:0] qspi_pd,
     input  wire       uart_rx,
     output wire       uart_tx,
-    output wire       uart_rts,    
+    output wire       uart_rts,
+    output wire       debug_uart_txd,
     input  wire       clk,
     input  wire       rst_n
 );
@@ -34,6 +35,8 @@ module tinyQV_top #(
     // Address to peripheral map
     localparam PERI_NONE = 4'h0;
     localparam PERI_ID = 4'h2;
+    localparam PERI_DEBUG_UART = 4'h6;
+    localparam PERI_DEBUG_UART_STATUS = 4'h7;    
     localparam PERI_TIME_LIMIT = 4'hB;
     localparam PERI_BIO_SEL = 4'hD;
     localparam PERI_BIO = 4'hE;
@@ -80,6 +83,10 @@ module tinyQV_top #(
     reg [31:0] data_from_read;
 
     reg [3:0] connect_peripheral;
+
+    // Debug UART - runs fast to reduce the width of the count necessary for the divider!
+    wire debug_uart_tx_busy;
+    wire debug_uart_tx_start = write_n != 2'b11 && connect_peripheral == PERI_DEBUG_UART;    
 
     // Time
     reg [6:2] time_limit;
@@ -263,6 +270,7 @@ module tinyQV_top #(
     always @(*) begin
         case (connect_peripheral)
             PERI_ID:          data_from_read = "WS_3";
+            PERI_DEBUG_UART_STATUS: data_from_read = {31'h0, debug_uart_tx_busy};
             PERI_TIME_LIMIT:  data_from_read = {25'h0, time_limit, 2'b11};
             PERI_BIO_SEL:     data_from_read = bio_sel;
             PERI_BIO:         data_from_read = bio_data_out;
@@ -273,6 +281,15 @@ module tinyQV_top #(
 
     assign data_ready = (connect_peripheral == PERI_USER) ? peri_data_ready : 
                         (connect_peripheral == PERI_BIO) ? bio_data_ready : 1'b1;
+
+    uart_tx #(.CLK_HZ(CLOCK_KHZ * 1_000), .BIT_RATE(1_000_000)) i_debug_uart_tx(
+        .clk(clk),
+        .resetn(rst_reg_n),
+        .uart_txd(debug_uart_txd),
+        .uart_tx_en(debug_uart_tx_start),
+        .uart_tx_data(data_to_write[7:0]),
+        .uart_tx_busy(debug_uart_tx_busy) 
+    );
 
     always @(posedge clk) begin
         if (!rst_reg_n) begin

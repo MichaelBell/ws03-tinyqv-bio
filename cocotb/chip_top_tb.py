@@ -13,7 +13,7 @@ from cocotb_tools.runner import get_runner
 
 from riscvmodel.insn import *
 
-from riscvmodel.regnames import x0, x1, sp, gp, tp, a0, a1, a2, a3, a4
+from riscvmodel.regnames import x0, x1, sp, gp, tp, a0, a1, a2, a3, a4, a5
 from riscvmodel import csrnames
 from riscvmodel.variant import RV32E
 
@@ -39,7 +39,7 @@ async def set_defaults(dut):
 
 async def start_clock(clock):
     """Start the clock"""
-    c = Clock(clock, 39.682, "ns")
+    c = Clock(clock, 20.832, "ns")
     cocotb.start_soon(c.start())
 
 
@@ -406,10 +406,10 @@ async def expect_store(dut, addr, bytes=4, allow_long_delay=False, allow_interru
 
     return val
 
-async def read_reg(dut, reg, allow_long_delay=False):
+async def read_reg(dut, reg, allow_long_delay=False, allow_long_delay_before=False):
     offset = random.randint(-0x400, 0x3FF)
     instr = InstructionSW(gp, reg, offset).encode()
-    await send_instr(dut, instr)
+    await send_instr(dut, instr, False, allow_long_delay_before)
 
     return await expect_store(dut, 0x1000400 + offset, 4, allow_long_delay)
 
@@ -444,7 +444,30 @@ async def load_val(dut, reg, val):
     await send_instr(dut, InstructionLUI(reg, value_upper).encode())
     await send_instr(dut, InstructionADDI(reg, reg, value_lower).encode())
 
-@cocotb.test()
+async def read_byte(dut, reg, expected_val):
+  await send_instr(dut, InstructionSW(tp, reg, 0x18).encode())
+
+  await start_nops(dut)
+  for i in range(240):
+      if dut.debug_uart_tx.value == 0:
+          break
+      else:
+          await Timer(5, "ns")
+  assert dut.debug_uart_tx.value == 0
+  bit_time = 1000
+  await Timer(bit_time / 2, "ns")
+  assert dut.debug_uart_tx.value == 0
+  for i in range(8):
+      await Timer(bit_time, "ns")
+      assert dut.debug_uart_tx.value == (expected_val & 1)
+      expected_val >>= 1
+  await Timer(bit_time, "ns")
+  assert dut.debug_uart_tx.value == 1
+
+  await stop_nops()
+
+
+#@cocotb.test()
 async def test_start(dut):
     """Run a simple GPIO test"""
 
@@ -461,6 +484,11 @@ async def test_start(dut):
     # Read ID
     await send_instr(dut, InstructionLW(x1, tp, 0x8).encode())
     assert await read_reg(dut, x1) == ord('3') | (ord('_') << 8) | (ord('S') << 16) | (ord('W') << 24)
+
+    # Check BIO ID
+    await send_instr(dut, InstructionLUI(a0, 0x9000).encode())
+    await send_instr(dut, InstructionLW(x1, a0, 0x4).encode())
+    assert await read_reg(dut, x1) == 0x08000480
 
     # Set up GPIO
     await send_instr(dut, InstructionADDI(x1, x0, -1).encode())
@@ -481,6 +509,307 @@ async def test_start(dut):
             assert dut.bidir_PAD.value[j+8] == (1 if (gpio_out >> j) & 1 else 0)
 
     logger.info("Done!")
+
+#@cocotb.test()
+async def test_uart(dut):
+    """Run a simple UART test"""
+
+    # Create a logger for this testbench
+    logger = logging.getLogger("my_testbench")
+
+    logger.info("Startup sequence...")
+
+    # Start up
+    await start_up(dut)
+
+    logger.info("Running the UART test...")
+
+    # Test UART TX
+    uart_byte = 0x54
+    await send_instr(dut, InstructionADDI(x1, x0, uart_byte).encode())
+    await send_instr(dut, InstructionSW(tp, x1, 0x80).encode())
+
+    await start_nops(dut)
+    bit_time = 8680
+    await Timer(bit_time / 2, "ns")
+    assert dut.uart_tx.value == 0
+    for i in range(8):
+        await Timer(bit_time, "ns")
+        assert dut.uart_tx.value == (uart_byte & 1)
+        uart_byte >>= 1
+    await Timer(bit_time, "ns")
+    assert dut.uart_tx.value == 1
+
+    # Test UART RX
+    for j in range(5):
+        assert dut.uart_rts.value == 0
+
+        uart_rx_byte = random.randint(0, 255)
+        val = uart_rx_byte
+        dut.uart_rx.value = 0
+        await Timer(bit_time, "ns")
+        for i in range(8):
+            dut.uart_rx.value = val & 1
+            await Timer(bit_time, "ns")
+            assert dut.uart_rts.value == 0
+            val >>= 1
+        dut.uart_rx.value = 1
+        await Timer(bit_time, "ns")
+        assert dut.uart_rts.value == 0
+
+        uart_rx_byte2 = random.randint(0, 255)
+        val = uart_rx_byte2
+        dut.uart_rx.value = 0
+        await Timer(bit_time, "ns")
+        for i in range(8):
+            dut.uart_rx.value = val & 1
+            await Timer(bit_time, "ns")
+            assert dut.uart_rts.value == 1
+            val >>= 1
+        dut.uart_rx.value = 1
+        await Timer(bit_time, "ns")
+        assert dut.uart_rts.value == 1
+
+        await stop_nops()
+
+        await send_instr(dut, InstructionLW(x1, tp, 0x84).encode())
+        await read_byte(dut, x1, 0x2)
+        await send_instr(dut, InstructionLW(x1, tp, 0x80).encode())
+        await read_byte(dut, x1, uart_rx_byte)
+        assert dut.uart_rts.value == 0
+        await send_instr(dut, InstructionLW(x1, tp, 0x84).encode())
+        await read_byte(dut, x1, 0x2)
+        await send_instr(dut, InstructionLW(x1, tp, 0x80).encode())
+        await read_byte(dut, x1, uart_rx_byte2)
+        assert dut.uart_rts.value == 0
+        await send_instr(dut, InstructionLW(x1, tp, 0x84).encode())
+        await read_byte(dut, x1, 0)
+
+        if j != 4:
+            await start_nops(dut)
+
+    # Test Debug UART TX
+    #uart_byte = 0x5A
+    #await send_instr(dut, InstructionADDI(x1, x0, uart_byte).encode())
+    #await read_byte(dut, x1, uart_byte)
+
+    logger.info("Done!")
+
+@cocotb.test()
+async def test_scratch_memory(dut):
+
+    def encode_sw2(base_reg, reg, imm):
+        instr = InstructionSW(base_reg, reg, imm).encode()
+        return instr | (3 << 12)
+
+    def encode_sw4(base_reg, reg, imm):
+        instr = InstructionSW(base_reg, reg, imm).encode()
+        return instr | (7 << 12)
+
+    def encode_lw2(reg, base_reg, imm):
+        instr = InstructionLW(reg, base_reg, imm).encode()
+        return instr | (3 << 12)
+
+    def encode_lw4(reg, base_reg, imm):
+        instr = InstructionLW(reg, base_reg, imm).encode()
+        return instr | (7 << 12)
+
+    # Create a logger for this testbench
+    logger = logging.getLogger("my_testbench")
+
+    logger.info("Startup sequence...")
+
+    # Start up
+    await start_up(dut)
+
+    logger.info("Running the Scratch memory test...")
+
+    RAM_SIZE = 512
+    RAM = [0]*RAM_SIZE
+    for i in range(0, RAM_SIZE, 4):
+        await send_instr(dut, InstructionADDI(x1, x0, i).encode())
+        await send_instr(dut, InstructionSW(x0, x1, i-0x400).encode())
+        RAM[i] = i & 0xff
+        RAM[i+1] = i >> 8
+
+    for i in range(0, RAM_SIZE, 4):
+        await send_instr(dut, InstructionLW(x1, x0, i-0x400).encode())
+        assert await read_reg(dut, x1) == i
+
+    mask = [0xfff, 0xffe, 0xffc, 0xff8, 0xff0]
+    for i in range(20):
+        write_len = random.randint(0,4)
+        write_addr = random.randint(0,RAM_SIZE - (1 << write_len)) & mask[write_len]
+        write_val = random.randint(0,0xffffffff)
+        await send_instr(dut, InstructionLUI(a0, (write_val >> 12) + ((write_val >> 11) & 1)).encode())
+        await send_instr(dut, InstructionADDI(a0, a0, (write_val & 0xfff) - (0x1000 if write_val & 0x800 else 0)).encode())
+        if write_len >= 3:
+            write_val2 = random.randint(0,0xffffffff)
+            await send_instr(dut, InstructionLUI(a1, (write_val2 >> 12) + ((write_val2 >> 11) & 1)).encode())
+            await send_instr(dut, InstructionADDI(a1, a1, (write_val2 & 0xfff) - (0x1000 if write_val2 & 0x800 else 0)).encode())
+        if write_len >= 4:
+            write_val3 = random.randint(0,0xffffffff)
+            write_val4 = random.randint(0,0xffffffff)
+            await send_instr(dut, InstructionLUI(a2, (write_val3 >> 12) + ((write_val3 >> 11) & 1)).encode())
+            await send_instr(dut, InstructionADDI(a2, a2, (write_val3 & 0xfff) - (0x1000 if write_val3 & 0x800 else 0)).encode())
+            await send_instr(dut, InstructionLUI(a3, (write_val4 >> 12) + ((write_val4 >> 11) & 1)).encode())
+            await send_instr(dut, InstructionADDI(a3, a3, (write_val4 & 0xfff) - (0x1000 if write_val4 & 0x800 else 0)).encode())
+
+        if write_len == 0: await send_instr(dut, InstructionSB(x0, a0, write_addr-0x400).encode())
+        elif write_len == 1: await send_instr(dut, InstructionSH(x0, a0, write_addr-0x400).encode())
+        elif write_len == 2: await send_instr(dut, InstructionSW(x0, a0, write_addr-0x400).encode())
+        elif write_len == 3: await send_instr(dut, encode_sw2(x0, a0, write_addr-0x400))
+        else: await send_instr(dut, encode_sw4(x0, a0, write_addr-0x400))
+
+        read_len = write_len
+        read_addr = write_addr
+        read_val = write_val        
+        if write_len == 0: read_val &= 0xff
+        if write_len == 1: read_val &= 0xffff
+        if write_len > 2: read_val2 = write_val2
+        if write_len > 3: 
+            read_val3 = write_val3
+            read_val4 = write_val4
+
+        RAM[write_addr] = write_val & 0xff
+        if write_len > 0: RAM[write_addr + 1] = (write_val >> 8) & 0xff
+        if write_len > 1:
+            RAM[write_addr + 2] = (write_val >> 16) & 0xff
+            RAM[write_addr + 3] = (write_val >> 24) & 0xff
+        if write_len > 2:
+            RAM[write_addr + 4] = write_val2 & 0xff
+            RAM[write_addr + 5] = (write_val2 >> 8) & 0xff
+            RAM[write_addr + 6] = (write_val2 >> 16) & 0xff
+            RAM[write_addr + 7] = (write_val2 >> 24) & 0xff
+        if write_len > 3:
+            RAM[write_addr + 8] = write_val3 & 0xff
+            RAM[write_addr + 9] = (write_val3 >> 8) & 0xff
+            RAM[write_addr + 10] = (write_val3 >> 16) & 0xff
+            RAM[write_addr + 11] = (write_val3 >> 24) & 0xff
+            RAM[write_addr + 12] = write_val4 & 0xff
+            RAM[write_addr + 13] = (write_val4 >> 8) & 0xff
+            RAM[write_addr + 14] = (write_val4 >> 16) & 0xff
+            RAM[write_addr + 15] = (write_val4 >> 24) & 0xff
+
+        if read_len == 0: await send_instr(dut, InstructionLBU(a2, x0, read_addr-0x400).encode())
+        elif read_len == 1: await send_instr(dut, InstructionLHU(a2, x0, read_addr-0x400).encode())
+        elif read_len == 2: await send_instr(dut, InstructionLW(a2, x0, read_addr-0x400).encode())
+        elif read_len == 3: await send_instr(dut, encode_lw2(a2, x0, read_addr-0x400))
+        else: await send_instr(dut, encode_lw4(a2, x0, read_addr-0x400))
+        assert await read_reg(dut, a2, read_len >= 3, read_len == 4) == read_val
+        if read_len > 2:
+            assert await read_reg(dut, a3) == read_val2
+        if read_len > 3:
+            assert await read_reg(dut, a4) == read_val3
+            assert await read_reg(dut, a5) == read_val4
+
+    for i in range(400):
+        if random.randint(0, 1) == 0:
+            read_len = random.randint(0,4)
+            read_addr = random.randint(0,RAM_SIZE - (1 << read_len)) & mask[read_len]
+            if read_len == 0: await send_instr(dut, InstructionLB(a0, x0, read_addr-0x400).encode())
+            elif read_len == 1: await send_instr(dut, InstructionLH(a0, x0, read_addr-0x400).encode())
+            elif read_len == 2: await send_instr(dut, InstructionLW(a0, x0, read_addr-0x400).encode())
+            elif read_len == 3: await send_instr(dut, encode_lw2(a0, x0, read_addr-0x400))
+            else: await send_instr(dut, encode_lw4(a0, x0, read_addr-0x400))
+            read_val = await read_reg(dut, a0, read_len >= 3)
+            assert (read_val & 0xFF) == RAM[read_addr]
+            if read_len > 0: assert ((read_val >> 8) & 0xFF) == RAM[read_addr+1]
+            if read_len > 1: 
+                assert ((read_val >> 16) & 0xFF) == RAM[read_addr+2]
+                assert ((read_val >> 24) & 0xFF) == RAM[read_addr+3]
+            if read_len > 2:
+                assert await read_reg(dut, a1) == RAM[read_addr+7] << 24 | RAM[read_addr+6] << 16 | RAM[read_addr+5] << 8 | RAM[read_addr+4]
+            if read_len > 3:
+                assert await read_reg(dut, a2) == RAM[read_addr+11] << 24 | RAM[read_addr+10] << 16 | RAM[read_addr+9] << 8 | RAM[read_addr+8]
+                assert await read_reg(dut, a3) == RAM[read_addr+15] << 24 | RAM[read_addr+14] << 16 | RAM[read_addr+13] << 8 | RAM[read_addr+12]
+        else:
+            write_len = random.randint(0,2)
+            write_addr = random.randint(0,RAM_SIZE - (1 << write_len)) & mask[write_len]
+            write_val = random.randint(0,0xffffffff)
+            await send_instr(dut, InstructionLUI(x1, (write_val >> 12) + ((write_val >> 11) & 1)).encode())
+            await send_instr(dut, InstructionADDI(x1, x1, (write_val & 0xfff) - (0x1000 if write_val & 0x800 else 0)).encode())
+
+            if write_len == 0: await send_instr(dut, InstructionSB(x0, x1, write_addr-0x400).encode())
+            elif write_len == 1: await send_instr(dut, InstructionSH(x0, x1, write_addr-0x400).encode())
+            else: await send_instr(dut, InstructionSW(x0, x1, write_addr-0x400).encode())
+            
+            RAM[write_addr] = write_val & 0xff
+            if write_len > 0: RAM[write_addr + 1] = (write_val >> 8) & 0xff
+            if write_len > 1:
+                RAM[write_addr + 2] = (write_val >> 16) & 0xff
+                RAM[write_addr + 3] = (write_val >> 24) & 0xff
+
+#@cocotb.test()
+async def test_bio_core_memory(dut):
+    # Create a logger for this testbench
+    logger = logging.getLogger("my_testbench")
+
+    logger.info("Startup sequence...")
+
+    # Start up
+    await start_up(dut)
+
+    logger.info("Running the Scratch memory test...")
+
+    RAM_SIZE = 2048
+    RAM_BASE = 0x9009000 # Core 0 memory
+    RAM = [0]*RAM_SIZE
+    await send_instr(dut, InstructionLUI(sp, RAM_BASE >> 12).encode())
+    for i in range(0, RAM_SIZE, 4):
+        await send_instr(dut, InstructionLUI(x1, (i >> 12) + ((i >> 11) & 1)).encode())
+        await send_instr(dut, InstructionADDI(x1, x1, (i & 0xfff) - (0x1000 if i & 0x800 else 0)).encode())
+        await send_instr(dut, InstructionSW(sp, x1, i).encode())
+        RAM[i] = i & 0xff
+        RAM[i+1] = i >> 8
+
+    for i in range(0, RAM_SIZE, 4):
+        await send_instr(dut, InstructionLW(x1, sp, i).encode())
+        assert await read_reg(dut, x1) == i
+
+    mask = [0xfff, 0xffe, 0xffc]
+    for i in range(20):
+        write_len = 2
+        write_addr = random.randint(0,RAM_SIZE - (1 << write_len)) & mask[write_len]
+        write_val = random.randint(0,0xffffffff)
+        await send_instr(dut, InstructionLUI(x1, (write_val >> 12) + ((write_val >> 11) & 1)).encode())
+        await send_instr(dut, InstructionADDI(x1, x1, (write_val & 0xfff) - (0x1000 if write_val & 0x800 else 0)).encode())
+        await send_instr(dut, InstructionSW(sp, x1, write_addr).encode())
+
+        read_len = write_len
+        read_addr = write_addr
+        read_val = write_val
+
+        RAM[write_addr] = write_val & 0xff
+        RAM[write_addr + 1] = (write_val >> 8) & 0xff
+        RAM[write_addr + 2] = (write_val >> 16) & 0xff
+        RAM[write_addr + 3] = (write_val >> 24) & 0xff
+
+        await send_instr(dut, InstructionLW(x1, sp, read_addr).encode())
+        assert await read_reg(dut, x1) == read_val
+
+    for i in range(300):
+        if random.randint(0, 1) == 0:
+            read_len = 2
+            read_addr = random.randint(0,RAM_SIZE - (1 << read_len)) & mask[read_len]
+            await send_instr(dut, InstructionLW(x1, sp, read_addr).encode())
+            read_val = await read_reg(dut, x1)
+            assert (read_val & 0xFF) == RAM[read_addr]
+            assert ((read_val >> 8) & 0xFF) == RAM[read_addr+1]
+            assert ((read_val >> 16) & 0xFF) == RAM[read_addr+2]
+            assert ((read_val >> 24) & 0xFF) == RAM[read_addr+3]
+        else:
+            write_len = 2
+            write_addr = random.randint(0,RAM_SIZE - (1 << write_len)) & mask[write_len]
+            write_val = random.randint(0,0xffffffff)
+            await send_instr(dut, InstructionLUI(x1, (write_val >> 12) + ((write_val >> 11) & 1)).encode())
+            await send_instr(dut, InstructionADDI(x1, x1, (write_val & 0xfff) - (0x1000 if write_val & 0x800 else 0)).encode())
+            await send_instr(dut, InstructionSW(sp, x1, write_addr).encode())
+            
+            RAM[write_addr] = write_val & 0xff
+            RAM[write_addr + 1] = (write_val >> 8) & 0xff
+            RAM[write_addr + 2] = (write_val >> 16) & 0xff
+            RAM[write_addr + 3] = (write_val >> 24) & 0xff
 
 
 def chip_top_runner():

@@ -92,6 +92,7 @@
                 # https://github.com/fossi-foundation/nix-eda/blob/main/nix/ghdl-bin.toml)
                 cocotb
                 riscv-model
+                pytest
               ];
           });
         }

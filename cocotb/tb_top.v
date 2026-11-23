@@ -18,6 +18,7 @@ module tb_top #(
     assign input_PAD = {prog_cs, prog_mosi, prog_n, uart_rx};
     wire uart_tx;
     wire uart_rts;
+    wire debug_uart_tx;
 
     wire prog_miso;
 
@@ -34,7 +35,8 @@ module tb_top #(
     assign gpio_out = bidir_PAD[39:8];
     assign uart_tx = bidir_PAD[40];
     assign uart_rts = bidir_PAD[41];
-    assign prog_miso = bidir_PAD[42];
+    assign debug_uart_tx = bidir_PAD[42];
+    assign prog_miso = bidir_PAD[43];
 
     wire clk_PAD;
     wire rst_n_PAD;

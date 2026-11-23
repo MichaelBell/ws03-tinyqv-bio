@@ -57,12 +57,13 @@ module chip_core #(
         .uart_rx(input_in[0]),
         .uart_tx(bidir_out[40]),
         .uart_rts(bidir_out[41]),
+        .debug_uart_txd(bidir_out[42]),
         .clk(clk),
         .rst_n(rst_n)
     );
 
     // TODO
-    assign bidir_out[NUM_BIDIR_PADS-1:42] = 1'b0;
+    assign bidir_out[NUM_BIDIR_PADS-1:43] = 1'b0;
     assign bidir_oe[NUM_BIDIR_PADS-1:40] = '1;
     assign bidir_pu[NUM_BIDIR_PADS-1:40] = '0;
     assign bidir_pd[NUM_BIDIR_PADS-1:40] = '0;
