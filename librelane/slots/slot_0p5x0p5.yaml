@@ -208,3 +208,5 @@ MACROS:
       "i_chip_core.tt.i_bio.cores[0].i_femto_bio_core.i_femtoram.i_ram.ram1024.sram_1":
         location: [969, 1700]
         orientation: E
+
+PL_ROUTABILITY_DRIVEN: false

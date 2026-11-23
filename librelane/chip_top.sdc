@@ -59,7 +59,7 @@ set_input_delay 2 -clock $clocks {rst_n_PAD}
 
 # Input-only pads
 set clk_core_input_ports [get_ports { 
-    input_PAD[*]
+    input_PAD*
 }] 
 
 set_input_delay -min 0 -clock $clocks $clk_core_input_ports

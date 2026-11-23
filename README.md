@@ -36,12 +36,14 @@ Testing!!
 | Bidir[4] | QSPI D2 |
 | Bidir[5] | QSPI D3 |
 | Bidir[6] | QSPI RAM A CS |
-| Bidir[7] | QSPI RAM B CS / Audio |
+| Bidir[7] | QSPI RAM B CS |
 | Bidir[39:8] | GPIO 31-0 |
 | Bidir[40] | UART TX |
 | Bidir[41] | UART RTS |
 | Bidir[42] | Debug UART TX |
-| Bidir[43] | Flash programming MISO |
+| Bidir[43] | USB DP |
+| Bidir[44] | USB DN |
+| Bidir[45] | Flash programming MISO |
 | Input[2]  | Flash programming MOSI |
 | Input[3]  | Flash programming CS |
 | Prog_CLK  | Flash programming SCK |
