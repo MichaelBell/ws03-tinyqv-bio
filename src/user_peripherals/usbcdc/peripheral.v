@@ -11,11 +11,12 @@ module tqvp_usb_cdc #(
     input         clk,          // Clock - the TinyQV project clock is normally set to 64MHz.
     input         rst_n,        // Reset_n - low to reset.
 
-    input  [NUM_GPIO-1:0]  ui_in,        // The input PMOD, always available.  Note that ui_in[7] is normally used for UART RX.
-                                         // The inputs are synchronized to the clock, note this will introduce 2 cycles of delay on the inputs.
+    input  usb_dp_in,
+    input  usb_dn_in,
 
-    output [NUM_GPIO-1:0]  uo_out,       // The output PMOD.  Each wire is only connected if this peripheral is selected.
-                                         // Note that uo_out[0] is normally used for UART TX.
+    output usb_dp_out,
+    output usb_dn_out,
+    output usb_pu_out,
 
     output usb_tx_en,
 
@@ -33,19 +34,6 @@ module tqvp_usb_cdc #(
 );
 
     localparam BIT_SAMPLES = 'd4;
-
-    wire  usb_dp_in = ui_in[3];
-    wire  usb_dn_in = ui_in[4];
-
-    wire usb_dp_out;
-    wire usb_dn_out;
-    wire usb_pu_out;
-
-    assign uo_out[2:0] = '0;
-    assign uo_out[3] = usb_dp_out;
-    assign uo_out[4] = usb_dn_out;
-    assign uo_out[5] = usb_pu_out;
-    assign uo_out[NUM_GPIO-1:6] = '0;
 
     wire [7:0] uart_rx_byte;
     wire       uart_rx_valid;
@@ -109,6 +97,6 @@ module tqvp_usb_cdc #(
       .dn_tx_o(usb_dn_out)
   );
 
-  wire _unused = &{data_in[31:8], ui_in[NUM_GPIO-1:5], ui_in[2:0], 1'b0};
+  wire _unused = &{data_in[31:8], 1'b0};
 
 endmodule

@@ -66,4 +66,6 @@
 `define NUM_BIDIR_PADS 45
 `define NUM_ANALOG_PADS 0
 
+`define NUM_BIO_CORES 1
+
 `endif

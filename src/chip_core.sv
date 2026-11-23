@@ -37,6 +37,8 @@ module chip_core #(
     assign bidir_cs = '0;
     assign bidir_sl = '0;
     assign bidir_ie = '1;
+
+    wire usb_tx_en;
     
     tinyQV_top tt(
         `ifdef USE_POWER_PINS_FOR_RAM
@@ -58,14 +60,26 @@ module chip_core #(
         .uart_tx(bidir_out[40]),
         .uart_rts(bidir_out[41]),
         .debug_uart_txd(bidir_out[42]),
+        .usb_dp_in(bidir_in[43]),
+        .usb_dn_in(bidir_in[44]),
+        .usb_dp_out(bidir_out[43]),
+        .usb_dn_out(bidir_out[44]),
+        .usb_pu_out(bidir_pu[43]),  // TODO: Check - this is probably not strong enough.  Can we tweak the pad?  Or just expose on another output.
+        .usb_tx_en(usb_tx_en),
         .clk(clk),
         .rst_n(rst_n)
     );
 
     // TODO
-    assign bidir_out[NUM_BIDIR_PADS-1:43] = 1'b0;
-    assign bidir_oe[NUM_BIDIR_PADS-1:40] = '1;
-    assign bidir_pu[NUM_BIDIR_PADS-1:40] = '0;
+`ifndef SLOT_0P5X0P5
+    assign bidir_out[NUM_BIDIR_PADS-1:45] = 1'b0;
+    assign bidir_oe[NUM_BIDIR_PADS-1:45] = '0;
+`endif
+
+    assign bidir_oe[42:40] = '1;
+    assign bidir_oe[44:43] = {2{usb_tx_en}};
+    assign bidir_pu[42:40] = '0;
+    assign bidir_pu[NUM_BIDIR_PADS-1:44] = '0;
     assign bidir_pd[NUM_BIDIR_PADS-1:40] = '0;
 
 endmodule

@@ -226,21 +226,21 @@ MACROS:
         - pdk_dir::libs.ref/gf180mcu_ocd_ip_sram/lib/gf180mcu_ocd_ip_sram__sram1024x8m8wm1__ss_125C_3v00.lib
     instances:
       # Make sure to specify the SRAMs in pdn_cfg.tcl
-      "i_chip_core.tt.i_bio.cores[0].i_femto_bio_core.i_femtoram.i_ram.genblk1.sram_0":
+      "i_chip_core.tt.i_bio.cores[0].i_femto_bio_core.i_femtoram.i_ram.ram1024.sram_0":
         location: [969, 1490]
         orientation: E
-      "i_chip_core.tt.i_bio.cores[0].i_femto_bio_core.i_femtoram.i_ram.genblk1.sram_1":
+      "i_chip_core.tt.i_bio.cores[0].i_femto_bio_core.i_femtoram.i_ram.ram1024.sram_1":
         location: [969, 1800]
         orientation: E
-      "i_chip_core.tt.i_bio.cores[1].i_femto_bio_core.i_femtoram.i_ram.genblk1.sram_0":
+      "i_chip_core.tt.i_bio.cores[1].i_femto_bio_core.i_femtoram.i_ram.ram1024.sram_0":
         location: [969, 2490]
         orientation: E
-      "i_chip_core.tt.i_bio.cores[1].i_femto_bio_core.i_femtoram.i_ram.genblk1.sram_1":
+      "i_chip_core.tt.i_bio.cores[1].i_femto_bio_core.i_femtoram.i_ram.ram1024.sram_1":
         location: [969, 2800]
         orientation: E
-      "i_chip_core.tt.i_bio.cores[2].i_femto_bio_core.i_femtoram.i_ram.genblk1.sram_0":
+      "i_chip_core.tt.i_bio.cores[2].i_femto_bio_core.i_femtoram.i_ram.ram1024.sram_0":
         location: [969, 3490]
         orientation: E
-      "i_chip_core.tt.i_bio.cores[2].i_femto_bio_core.i_femtoram.i_ram.genblk1.sram_1":
+      "i_chip_core.tt.i_bio.cores[2].i_femto_bio_core.i_femtoram.i_ram.ram1024.sram_1":
         location: [969, 3800]
         orientation: E

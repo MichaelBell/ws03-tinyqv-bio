@@ -3,6 +3,6 @@
 # This is an alternative method compared to
 # specifying the power connections in the RTL
 PDN_MACRO_CONNECTIONS:
-- "i_chip_core.tt.i_bio.*.i_femto_bio_core.i_femtoram.i_ram.genblk1.sram_0 VDD VSS VDD VSS"
-- "i_chip_core.tt.i_bio.*.i_femto_bio_core.i_femtoram.i_ram.genblk1.sram_1 VDD VSS VDD VSS"
+- "i_chip_core.tt.i_bio.*.i_femto_bio_core.i_femtoram.i_ram.ram1024.sram_0 VDD VSS VDD VSS"
+- "i_chip_core.tt.i_bio.*.i_femto_bio_core.i_femtoram.i_ram.ram1024.sram_1 VDD VSS VDD VSS"
 - "i_chip_core.tt.i_tinyqv.cpu.i_scratch.i_sram VDD VSS VDD VSS"

@@ -27,6 +27,12 @@ module tinyQV_top #(
     input  wire       uart_rx,
     output wire       uart_tx,
     output wire       uart_rts,
+    input  wire       usb_dp_in,
+    input  wire       usb_dn_in,
+    output wire       usb_dp_out,
+    output wire       usb_dn_out,
+    output wire       usb_pu_out,    
+    output wire       usb_tx_en,
     output wire       debug_uart_txd,
     input  wire       clk,
     input  wire       rst_n
@@ -218,6 +224,13 @@ module tinyQV_top #(
         .uart_rx(uart_rx_sync),
         .uart_tx(uart_tx),
         .uart_rts(uart_rts),
+
+        .usb_dp_in(usb_dp_in),
+        .usb_dn_in(usb_dn_in),
+        .usb_dp_out(usb_dp_out),
+        .usb_dn_out(usb_dn_out),
+        .usb_pu_out(usb_pu_out),
+        .usb_tx_en(usb_tx_en),
 
         .addr_in(addr[10:0]),
         .data_in(data_to_write),

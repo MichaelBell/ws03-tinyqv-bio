@@ -72,6 +72,7 @@ module femto_reg_file (
     assign rs2 = registerFile[rs2_id];
 
 `else
+/*  No clock gate currently available - so use flops for the registers.
 
     reg [31:0] wdata;
     reg rst;
@@ -104,6 +105,26 @@ module femto_reg_file (
 
     assign rs1 = rdata[rs1_id];
     assign rs2 = rdata[rs2_id];
+*/
+
+    reg [31:0] registerFile [15:0];
+
+    generate
+    for (genvar i = 1; i < 16; i = i + 1) begin : reg_loop
+        always @(posedge clk) begin
+            if (~rst_n)
+                registerFile[i] <= 32'b0;
+            else if (rd_id == i && we)
+                registerFile[i] <= rd_wdata;
+        end
+    end
+    endgenerate
+    always @(*) begin
+        registerFile[0] = 32'b0;
+    end
+
+    assign rs1 = registerFile[rs1_id];
+    assign rs2 = registerFile[rs2_id];
 
 `endif
 

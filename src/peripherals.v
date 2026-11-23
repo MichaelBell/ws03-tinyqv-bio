@@ -32,6 +32,13 @@ module tinyQV_peripherals #(
     output        uart_rts,
     input         uart_rx,
 
+    input  usb_dp_in,
+    input  usb_dn_in,
+    output usb_dp_out,
+    output usb_dn_out,
+    output usb_pu_out,    
+    output usb_tx_en,
+
     input [10:0]  addr_in,
     input [31:0]  data_in,      // Data in to the peripheral, bottom 8, 16 or all 32 bits are valid on write.
 
@@ -175,11 +182,7 @@ module tinyQV_peripherals #(
     assign data_ready_from_user_peri[PERI_GPIO] = 1;
     assign uo_out_from_user_peri[PERI_GPIO] = io_out;
 
-    wire usb_tx_en;
-    assign gpio_oe[NUM_GPIO-1:5] = io_oe[NUM_GPIO-1:5];
-    assign gpio_oe[4] = gpio_out_func_sel[4] == 5'd7 ? usb_tx_en : io_oe[4];
-    assign gpio_oe[3] = gpio_out_func_sel[3] == 5'd7 ? usb_tx_en : io_oe[3];
-    assign gpio_oe[2:0] = io_oe[2:0];
+    assign gpio_oe = io_oe;
     assign gpio_pu = io_pu;
     assign gpio_pd = io_pd;
 
@@ -259,8 +262,12 @@ module tinyQV_peripherals #(
         .clk(clk),
         .rst_n(rst_n_rebuf),
 
-        .ui_in(gpio_in),
-        .uo_out(uo_out_from_user_peri[4]),
+        .usb_dp_in(usb_dp_in),
+        .usb_dn_in(usb_dn_in),
+
+        .usb_dp_out(usb_dp_out),
+        .usb_dn_out(usb_dn_out),
+        .usb_pu_out(usb_pu_out),
 
         .usb_tx_en(usb_tx_en),
 
@@ -275,6 +282,7 @@ module tinyQV_peripherals #(
 
         .user_interrupt(user_interrupts[4])
     );
+    assign uo_out_from_user_peri[4] = '0;
 
     assign user_interrupts[7:5] = 3'b000;
 

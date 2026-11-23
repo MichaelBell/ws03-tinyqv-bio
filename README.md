@@ -15,11 +15,9 @@ The design is intended to run at 3v3 at 48MHz.
 
 ## TODO
 
-Increase BIO SRAM to 2kB
-Add debug UART back and wire up
-Add programming interface as on previous TQVs
-Document USB CDC (and add docs to TQVE too!)
-Change USB CDC to use gpio pullup instead of external pin
+* Add programming interface as on previous TQVs
+* Add old style SPI on non-quarter slot
+* Document USB CDC (and add docs to TQVE too!)
 
 Testing!!
 

@@ -78,8 +78,6 @@ all: librelane ## Build the project (runs LibreLane)
 
 $(PDK_ROOT)/ciel/gf180mcu/versions/$(PDK_COMMIT)/$(PDK):
 	ciel enable $(PDK_COMMIT) --pdk-root $(PDK_ROOT) --pdk $(PDK) --include-libraries all
-	sed -i 's/GF018hv5v_mcu_sc7/unithd/' $(PDK_ROOT)/ciel/gf180mcu/versions/$(PDK_COMMIT)/$(PDK)/libs.ref/gf180mcu_fd_sc_mcu7t5v0/lef/gf180mcu_fd_sc_mcu7t5v0.lef
-	sed -i 's/GF018hv5v_mcu_sc7/unithd/' $(PDK_ROOT)/ciel/gf180mcu/versions/$(PDK_COMMIT)/$(PDK)/libs.ref/gf180mcu_fd_sc_mcu7t5v0/techlef/*
 
 clone-pdk: $(PDK_ROOT)/ciel/gf180mcu/versions/$(PDK_COMMIT)/$(PDK) ## Clone the gf180mcu PDK
 .PHONY: clone-pdk
@@ -128,6 +126,10 @@ librelane-floorplan: clone-pdk defines ## Open the last run in KLayout
 librelane-pdn: clone-pdk defines ## Open the last run in KLayout
 	SRAM_DEFINE=${SRAM_DEFINE} librelane ${LIBRELANE_CONFIGS} ${LIBRELANE_OPTS} --last-run --from OpenROAD.GeneratePDN
 .PHONY: librelane-pdn
+
+librelane-timing: clone-pdk defines ## Open the last run in KLayout
+	SRAM_DEFINE=${SRAM_DEFINE} librelane ${LIBRELANE_CONFIGS} ${LIBRELANE_OPTS} --to OpenROAD.STAMidPNR-3
+.PHONY: librelane-timing
 
 librelane-padring: clone-pdk defines ## Only create the padring
 	python3 scripts/padring.py ${LIBRELANE_CONFIGS} ${LIBRELANE_OPTS}

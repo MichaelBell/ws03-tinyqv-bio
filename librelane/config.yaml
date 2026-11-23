@@ -233,33 +233,3 @@ KLAYOUT_ANTENNA_OPTIONS:
   decks: "antenna"
   variant: ref::$PDK
   workers: max
-
-LIB:
-  "*_tt_025C_3v30":
-    - pdk_dir::libs.ref/gf180mcu_as_sc_mcu7t3v3/lib/gf180mcu_as_sc_mcu7t3v3__tt_025C_3v30.lib
-    - pdk_dir::libs.ref/gf180mcu_fd_sc_mcu7t5v0/lib/gf180mcu_fd_sc_mcu7t5v0__tt_025C_3v30.lib
-  "*_ff_n40C_3v60":
-    - pdk_dir::libs.ref/gf180mcu_as_sc_mcu7t3v3/lib/gf180mcu_as_sc_mcu7t3v3__ff_n40C_3v60.lib
-    - pdk_dir::libs.ref/gf180mcu_fd_sc_mcu7t5v0/lib/gf180mcu_fd_sc_mcu7t5v0__ff_n40C_3v60.lib
-  "*_ss_125C_3v00":
-    - pdk_dir::libs.ref/gf180mcu_as_sc_mcu7t3v3/lib/gf180mcu_as_sc_mcu7t3v3__ss_125C_3v00.lib
-    - pdk_dir::libs.ref/gf180mcu_fd_sc_mcu7t5v0/lib/gf180mcu_fd_sc_mcu7t5v0__ss_125C_3v00.lib
-
-CELL_LEFS:
-  - pdk_dir::libs.ref/gf180mcu_as_sc_mcu7t3v3/lef/gf180mcu_as_sc_mcu7t3v3.lef
-  - pdk_dir::libs.ref/gf180mcu_fd_sc_mcu7t5v0/lef/gf180mcu_fd_sc_mcu7t5v0.lef
-
-CELL_GDS:
-  - pdk_dir::libs.ref/gf180mcu_as_sc_mcu7t3v3/gds/gf180mcu_as_sc_mcu7t3v3.gds
-  - pdk_dir::libs.ref/gf180mcu_fd_sc_mcu7t5v0/gds/gf180mcu_fd_sc_mcu7t5v0.gds
-
-CELL_VERILOG_MODELS:
-  - pdk_dir::libs.ref/gf180mcu_as_sc_mcu7t3v3/verilog/gf180mcu_as_sc_mcu7t3v3.v
-  - pdk_dir::libs.ref/gf180mcu_fd_sc_mcu7t5v0/verilog/gf180mcu_fd_sc_mcu7t5v0.v
-
-SYNTH_READ_BLACKBOX_LIB: true
-
-EXTRA_EXCLUDED_CELLS:
-  - "gf180mcu_fd_sc_mcu7t5v0__*"
-
-#VERILOG_DEFINES: ["USE_POWER_PINS_FOR_RAM"]

@@ -46,7 +46,7 @@ module internal_ram #(parameter RAM_WIDTH=11) (
         .A(!rst_n), .Y(cen));
 
     generate
-        if (RAM_WIDTH == 11) begin
+        if (RAM_WIDTH == 11) begin : ram1024
             gf180mcu_ocd_ip_sram__sram1024x8m8wm1 sram_0 (
                 `ifdef USE_POWER_PINS_FOR_RAM
                 .VDD  (VDD),
@@ -76,7 +76,7 @@ module internal_ram #(parameter RAM_WIDTH=11) (
                 .D    (data_in[15:8]),
                 .Q    (data_out[15:8])
             );
-        end else if (RAM_WIDTH == 10) begin
+        end else if (RAM_WIDTH == 10) begin : ram512
             gf180mcu_ocd_ip_sram__sram512x8m8wm1 sram_0 (
                 `ifdef USE_POWER_PINS_FOR_RAM
                 .VDD  (VDD),
