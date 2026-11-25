@@ -234,3 +234,39 @@ KLAYOUT_ANTENNA_OPTIONS:
   decks: "antenna"
   variant: ref::$PDK
   workers: max
+
+PAD_GDS:
+  - pdk_dir::libs.ref/gf180mcu_ocd_io/gds/gf180mcu_ocd_io.gds
+  - dir::../ip/gf180mcu_tnt_io/gf180mcu_tnt_io__bi_24t_usb.gds
+PAD_LEFS:
+  - pdk_dir::libs.ref/gf180mcu_ocd_io/lef/gf180mcu_ocd_io.lef
+  - dir::../ip/gf180mcu_tnt_io/gf180mcu_tnt_io__bi_24t_usb.lef
+PAD_VERILOG_MODELS: 
+  - pdk_dir::libs.ref/gf180mcu_ocd_io/verilog/gf180mcu_ocd_io__blackbox_pp.v
+  - dir::../ip/gf180mcu_tnt_io/gf180mcu_tnt_io__bi_24t_usb.v
+
+EXTRA_VERILOG_MODELS:
+  - dir::../ip/gf180mcu_tnt_io/gf180mcu_tnt_io__bi_24t_usb.v
+
+PAD_PLACE_IO_TERMINALS:
+  - "gf180mcu_ocd_io__asig_5p0/ASIG5V"
+  - "gf180mcu_ocd_io__bi_24t/PAD"
+  - "gf180mcu_ocd_io__bi_t/PAD"
+  - "gf180mcu_ocd_io__in_c/PAD"
+  - "gf180mcu_ocd_io__in_s/PAD"
+  - "gf180mcu_ocd_io__dvss/DVSS"
+  - "gf180mcu_ocd_io__dvdd/DVDD"
+  - "gf180mcu_ocd_io__vss/VSS"
+  - "gf180mcu_ocd_io__vdd/VDD"
+  - "gf180mcu_tnt_io__bi_24t_usb/PAD"
+
+PAD_LIBS:
+  "*_tt_025C_3v30":
+    - "pdk_dir::libs.ref/gf180mcu_ocd_io/lib/gf180mcu_ocd_io__tt_025C_3v30.lib"
+    - "dir::../ip/gf180mcu_tnt_io/gf180mcu_tnt_io__tt_025C_3v30.lib"
+  "*_ff_n40C_3v60":
+    - "pdk_dir::libs.ref/gf180mcu_ocd_io/lib/gf180mcu_ocd_io__ff_n40C_3v63.lib"
+    - "dir::../ip/gf180mcu_tnt_io/gf180mcu_tnt_io__ff_n40C_3v63.lib"
+  "*_ss_125C_3v00":
+    - "pdk_dir::libs.ref/gf180mcu_ocd_io/lib/gf180mcu_ocd_io__ss_125C_2v97.lib"
+    - "dir::../ip/gf180mcu_tnt_io/gf180mcu_tnt_io__ss_125C_2v97.lib"

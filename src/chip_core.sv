@@ -64,7 +64,7 @@ module chip_core #(
         .usb_dn_in(bidir_in[44]),
         .usb_dp_out(bidir_out[43]),
         .usb_dn_out(bidir_out[44]),
-        .usb_pu_out(bidir_pu[43]),  // TODO: Check - this is probably not strong enough.  Can we tweak the pad?  Or just expose on another output.
+        .usb_pu_out(bidir_pu[43]),
         .usb_tx_en(usb_tx_en),
         .clk(clk),
         .rst_n(rst_n)

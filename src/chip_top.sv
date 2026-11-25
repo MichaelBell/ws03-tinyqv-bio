@@ -188,27 +188,51 @@ module chip_top #(
 
     generate
     for (genvar i=0; i<NUM_BIDIR_PADS; i++) begin : bidir
-        (* keep *)
-        `gf180mcu_xxx_io__bi_24t pad (
-            `ifdef USE_POWER_PINS
-            .DVDD   (DVDD),
-            .DVSS   (DVSS),
-            .VDD    (VDD),
-            .VSS    (VSS),
-            `endif
-        
-            .A      (bidir_CORE2PAD[i]),
-            .OE     (bidir_CORE2PAD_OE[i]),
-            .Y      (bidir_PAD2CORE[i]),
-            .PAD    (bidir_PAD[i]),
+        if (i == 43) begin : usb
+            (* keep *)
+            gf180mcu_tnt_io__bi_24t_usb pad (
+                `ifdef USE_POWER_PINS
+                .DVDD   (DVDD),
+                .DVSS   (DVSS),
+                .VDD    (VDD),
+                .VSS    (VSS),
+                `endif
             
-            .CS     (bidir_CORE2PAD_CS[i]),
-            .SL     (bidir_CORE2PAD_SL[i]),
-            .IE     (bidir_CORE2PAD_IE[i]),
+                .A      (bidir_CORE2PAD[i]),
+                .OE     (bidir_CORE2PAD_OE[i]),
+                .Y      (bidir_PAD2CORE[i]),
+                .PAD    (bidir_PAD[i]),
+                
+                .CS     (bidir_CORE2PAD_CS[i]),
+                .SL     (bidir_CORE2PAD_SL[i]),
+                .IE     (bidir_CORE2PAD_IE[i]),
 
-            .PU     (bidir_CORE2PAD_PU[i]),
-            .PD     (bidir_CORE2PAD_PD[i])
-        );
+                .PU     (bidir_CORE2PAD_PU[i]),
+                .PD     (bidir_CORE2PAD_PD[i])
+            );
+        end else begin : std
+            (* keep *)
+            `gf180mcu_xxx_io__bi_24t pad (
+                `ifdef USE_POWER_PINS
+                .DVDD   (DVDD),
+                .DVSS   (DVSS),
+                .VDD    (VDD),
+                .VSS    (VSS),
+                `endif
+
+                .A      (bidir_CORE2PAD[i]),
+                .OE     (bidir_CORE2PAD_OE[i]),
+                .Y      (bidir_PAD2CORE[i]),
+                .PAD    (bidir_PAD[i]),
+
+                .CS     (bidir_CORE2PAD_CS[i]),
+                .SL     (bidir_CORE2PAD_SL[i]),
+                .IE     (bidir_CORE2PAD_IE[i]),
+
+                .PU     (bidir_CORE2PAD_PU[i]),
+                .PD     (bidir_CORE2PAD_PD[i])
+            );
+        end
     end
     endgenerate
 

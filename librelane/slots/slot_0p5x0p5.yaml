@@ -13,75 +13,75 @@ PAD_SOUTH: [
     "dvss_pads\\[0\\].pad",
     "dvdd_pads\\[0\\].pad",
 
-    "bidir\\[0\\].pad",
-    "bidir\\[1\\].pad",
-    "bidir\\[2\\].pad",
-    "bidir\\[3\\].pad",
-    "bidir\\[4\\].pad",
-    "bidir\\[5\\].pad",
-    "bidir\\[6\\].pad"
+    "bidir\\[0\\].std.pad",
+    "bidir\\[1\\].std.pad",
+    "bidir\\[2\\].std.pad",
+    "bidir\\[3\\].std.pad",
+    "bidir\\[4\\].std.pad",
+    "bidir\\[5\\].std.pad",
+    "bidir\\[6\\].std.pad"
 ]
 
 PAD_EAST: [
-    "bidir\\[7\\].pad",
-    "bidir\\[8\\].pad",
-    "bidir\\[9\\].pad",
-    "bidir\\[10\\].pad",
-    "bidir\\[11\\].pad",
-    "bidir\\[12\\].pad",
-    "bidir\\[13\\].pad",
-    "bidir\\[14\\].pad",
+    "bidir\\[7\\].std.pad",
+    "bidir\\[8\\].std.pad",
+    "bidir\\[9\\].std.pad",
+    "bidir\\[10\\].std.pad",
+    "bidir\\[11\\].std.pad",
+    "bidir\\[12\\].std.pad",
+    "bidir\\[13\\].std.pad",
+    "bidir\\[14\\].std.pad",
 
     "dvss_pads\\[1\\].pad",
     "dvdd_pads\\[1\\].pad",
 
-    "bidir\\[15\\].pad",
-    "bidir\\[16\\].pad",
-    "bidir\\[17\\].pad",
-    "bidir\\[18\\].pad",
-    "bidir\\[19\\].pad",
-    "bidir\\[20\\].pad",
-    "bidir\\[21\\].pad"
+    "bidir\\[15\\].std.pad",
+    "bidir\\[16\\].std.pad",
+    "bidir\\[17\\].std.pad",
+    "bidir\\[18\\].std.pad",
+    "bidir\\[19\\].std.pad",
+    "bidir\\[20\\].std.pad",
+    "bidir\\[21\\].std.pad"
 ]
 
 PAD_NORTH: [
-    "bidir\\[30\\].pad",
-    "bidir\\[29\\].pad",
+    "bidir\\[30\\].std.pad",
+    "bidir\\[29\\].std.pad",
 
     "dvss_pads\\[2\\].pad",
     "dvdd_pads\\[2\\].pad",
 
-    "bidir\\[28\\].pad",
-    "bidir\\[27\\].pad",
+    "bidir\\[28\\].std.pad",
+    "bidir\\[27\\].std.pad",
 
-    "bidir\\[26\\].pad",
-    "bidir\\[25\\].pad",
-    "bidir\\[24\\].pad",
-    "bidir\\[23\\].pad",
-    "bidir\\[22\\].pad"
+    "bidir\\[26\\].std.pad",
+    "bidir\\[25\\].std.pad",
+    "bidir\\[24\\].std.pad",
+    "bidir\\[23\\].std.pad",
+    "bidir\\[22\\].std.pad"
 ]
 
 PAD_WEST: [
     "inputs\\[0\\].pad",
-    "bidir\\[44\\].pad",
-    "bidir\\[43\\].pad",
-    "bidir\\[42\\].pad",
-    "bidir\\[41\\].pad",
-    "bidir\\[40\\].pad",
-    "bidir\\[39\\].pad",
-    "bidir\\[38\\].pad",
-    "bidir\\[37\\].pad",
-    "bidir\\[36\\].pad",
-    "bidir\\[35\\].pad",
+    "bidir\\[44\\].std.pad",
+    "bidir\\[43\\].usb.pad",
+    "bidir\\[42\\].std.pad",
+    "bidir\\[41\\].std.pad",
+    "bidir\\[40\\].std.pad",
+    "bidir\\[39\\].std.pad",
+    "bidir\\[38\\].std.pad",
+    "bidir\\[37\\].std.pad",
+    "bidir\\[36\\].std.pad",
+    "bidir\\[35\\].std.pad",
 
-    "bidir\\[34\\].pad",
-    "bidir\\[33\\].pad",
+    "bidir\\[34\\].std.pad",
+    "bidir\\[33\\].std.pad",
     
     "vss_pads\\[0\\].pad",
     "vdd_pads\\[0\\].pad",
     
-    "bidir\\[32\\].pad",
-    "bidir\\[31\\].pad"
+    "bidir\\[32\\].std.pad",
+    "bidir\\[31\\].std.pad"
 ]
 
 MACROS:
@@ -165,20 +165,20 @@ MACROS:
         orientation: N
 
   # 3.3V SRAM
-  gf180mcu_ocd_ip_sram__sram512x8m8wm1:
+  gf180mcu_ocd_ip_sram__sram256x8m8wm1:
     gds:
-      - pdk_dir::libs.ref/gf180mcu_ocd_ip_sram/gds/gf180mcu_ocd_ip_sram__sram512x8m8wm1.gds
+      - pdk_dir::libs.ref/gf180mcu_ocd_ip_sram/gds/gf180mcu_ocd_ip_sram__sram256x8m8wm1.gds
     lef:
-      - pdk_dir::libs.ref/gf180mcu_ocd_ip_sram/lef/gf180mcu_ocd_ip_sram__sram512x8m8wm1.lef
+      - pdk_dir::libs.ref/gf180mcu_ocd_ip_sram/lef/gf180mcu_ocd_ip_sram__sram256x8m8wm1.lef
     vh:
-      - pdk_dir::libs.ref/gf180mcu_ocd_ip_sram/verilog/gf180mcu_ocd_ip_sram__sram512x8m8wm1__blackbox_pp.v
+      - pdk_dir::libs.ref/gf180mcu_ocd_ip_sram/verilog/gf180mcu_ocd_ip_sram__sram256x8m8wm1__blackbox_pp.v
     lib:
       "*_tt_025C_3v30":
-        - pdk_dir::libs.ref/gf180mcu_ocd_ip_sram/lib/gf180mcu_ocd_ip_sram__sram512x8m8wm1__tt_025C_3v30.lib
+        - pdk_dir::libs.ref/gf180mcu_ocd_ip_sram/lib/gf180mcu_ocd_ip_sram__sram256x8m8wm1__tt_025C_3v30.lib
       "*_ff_n40C_3v60":
-        - pdk_dir::libs.ref/gf180mcu_ocd_ip_sram/lib/gf180mcu_ocd_ip_sram__sram512x8m8wm1__ff_n40C_3v60.lib
+        - pdk_dir::libs.ref/gf180mcu_ocd_ip_sram/lib/gf180mcu_ocd_ip_sram__sram256x8m8wm1__ff_n40C_3v60.lib
       "*_ss_125C_3v00":
-        - pdk_dir::libs.ref/gf180mcu_ocd_ip_sram/lib/gf180mcu_ocd_ip_sram__sram512x8m8wm1__ss_125C_3v00.lib
+        - pdk_dir::libs.ref/gf180mcu_ocd_ip_sram/lib/gf180mcu_ocd_ip_sram__sram256x8m8wm1__ss_125C_3v00.lib
     instances:
       # Make sure to specify the SRAMs in pdn_cfg.tcl
       "i_chip_core.tt.i_tinyqv.cpu.i_scratch.i_sram":
