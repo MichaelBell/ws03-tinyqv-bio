@@ -72,14 +72,14 @@ PAD_NORTH: [
 
 
 PAD_WEST: [
-    "inputs\\[3\\].std.pad",
-    "inputs\\[2\\].std.pad",
-    "inputs\\[1\\].std.pad",
+    "inputs\\[3\\].pad",
+    "inputs\\[2\\].pad",
+    "inputs\\[1\\].pad",
     
     "vss_pads\\[0\\].pad",
     "vdd_pads\\[0\\].pad",
     
-    "inputs\\[0\\].std.pad",
+    "inputs\\[0\\].pad",
     "bidir\\[49\\].std.pad",
     "bidir\\[48\\].std.pad",
     "bidir\\[47\\].std.pad",
