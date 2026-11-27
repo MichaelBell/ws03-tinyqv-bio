@@ -40,7 +40,7 @@ add_pdn_stripe \
 
 define_pdn_grid \
     -macro \
-    -instances {i_chip_core.tt.i_bio.*.i_femto_bio_core.i_femtoram.i_ram.ram1024.sram_0 i_chip_core.tt.i_bio.*.i_femto_bio_core.i_femtoram.i_ram.ram1024.sram_1} \
+    -instances {i_chip_core.tt.i_bio.*.i_femto_bio_core.i_femtoram.i_ram.*.sram_0 i_chip_core.tt.i_bio.*.i_femto_bio_core.i_femtoram.i_ram.*.sram_1} \
     -name sram_macros_WE \
     -starts_with POWER \
     -halo "$::env(PDN_HORIZONTAL_HALO) $::env(PDN_VERTICAL_HALO)"
@@ -54,34 +54,58 @@ add_pdn_connect \
     -layers "$::env(PDN_VERTICAL_LAYER) Metal3"
 
 # Add stripes on W/E edges of SRAM
-add_pdn_stripe \
-    -grid sram_macros_WE \
-    -layer Metal4 \
-    -width 1.36 \
-    -offset 0.68 \
-    -spacing 0.28 \
-    -pitch 512.81 \
-    -starts_with POWER \
-    -number_of_straps 1
+if {$::env(SLOT_DEFINE) == "SLOT_0P5X0P5"} {
+    add_pdn_stripe \
+        -grid sram_macros_WE \
+        -layer Metal4 \
+        -width 1.36 \
+        -offset 0.68 \
+        -spacing 0.28 \
+        -pitch 319.09 \
+        -starts_with POWER \
+        -number_of_straps 2
 
-add_pdn_stripe \
-    -grid sram_macros_WE \
-    -layer Metal4 \
-    -width 1.36 \
-    -offset 508.49 \
-    -spacing 0.28 \
-    -pitch 5.0 \
-    -starts_with GROUND \
-    -number_of_straps 2
+    # Since the above stripes block the top level PDN at Metal4, add some more stripes
+    # to improve the PDN's integrity and ensure a better connection for the macro.
+    add_pdn_stripe \
+        -grid sram_macros_WE \
+        -layer Metal4 \
+        -width 4.00 \
+        -offset 28.0 \
+        -spacing 0.28 \
+        -pitch 43.50 \
+        -starts_with GROUND \
+        -number_of_straps 7
+} else {
+    add_pdn_stripe \
+        -grid sram_macros_WE \
+        -layer Metal4 \
+        -width 1.36 \
+        -offset 0.68 \
+        -spacing 0.28 \
+        -pitch 512.81 \
+        -starts_with POWER \
+        -number_of_straps 1
 
-# Since the above stripes block the top level PDN at Metal4, add some more stripes
-# to improve the PDN's integrity and ensure a better connection for the macro.
-add_pdn_stripe \
-    -grid sram_macros_WE \
-    -layer Metal4 \
-    -width 4.00 \
-    -offset 28.0 \
-    -spacing 0.28 \
-    -pitch 45.98 \
-    -starts_with GROUND \
-    -number_of_straps 11
+    add_pdn_stripe \
+        -grid sram_macros_WE \
+        -layer Metal4 \
+        -width 1.36 \
+        -offset 508.49 \
+        -spacing 0.28 \
+        -pitch 5.0 \
+        -starts_with GROUND \
+        -number_of_straps 2
+
+    # Since the above stripes block the top level PDN at Metal4, add some more stripes
+    # to improve the PDN's integrity and ensure a better connection for the macro.
+    add_pdn_stripe \
+        -grid sram_macros_WE \
+        -layer Metal4 \
+        -width 4.00 \
+        -offset 28.0 \
+        -spacing 0.28 \
+        -pitch 45.98 \
+        -starts_with GROUND \
+        -number_of_straps 11    
+}

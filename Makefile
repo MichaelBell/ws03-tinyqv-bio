@@ -92,43 +92,43 @@ defines:
 .PHONY: defines
 
 librelane: clone-pdk defines ## Run LibreLane flow (synthesis, PnR, verification)
-	SRAM_DEFINE=${SRAM_DEFINE} librelane ${LIBRELANE_CONFIGS} ${LIBRELANE_OPTS} --save-views-to $(MAKEFILE_DIR)/final
+	SRAM_DEFINE=${SRAM_DEFINE} SLOT_DEFINE=${SLOT_DEFINE} librelane ${LIBRELANE_CONFIGS} ${LIBRELANE_OPTS} --save-views-to $(MAKEFILE_DIR)/final
 .PHONY: librelane
 
 librelane-condensed: clone-pdk defines ## Run LibreLane flow (synthesis, PnR, verification)
-	SRAM_DEFINE=${SRAM_DEFINE} librelane --condensed ${LIBRELANE_CONFIGS} ${LIBRELANE_OPTS} --save-views-to $(MAKEFILE_DIR)/final
+	SRAM_DEFINE=${SRAM_DEFINE} SLOT_DEFINE=${SLOT_DEFINE} librelane --condensed ${LIBRELANE_CONFIGS} ${LIBRELANE_OPTS} --save-views-to $(MAKEFILE_DIR)/final
 .PHONY: librelane-condensed
 
 librelane-nodrc: clone-pdk defines ## Run LibreLane flow without DRC checks
-	SRAM_DEFINE=${SRAM_DEFINE} librelane ${LIBRELANE_CONFIGS} ${LIBRELANE_OPTS} --save-views-to $(MAKEFILE_DIR)/final --skip KLayout.Antenna --skip KLayout.DRC --skip Magic.DRC --skip KLayout.Density --skip OpenROAD.IRDropReport
+	SRAM_DEFINE=${SRAM_DEFINE} SLOT_DEFINE=${SLOT_DEFINE} librelane ${LIBRELANE_CONFIGS} ${LIBRELANE_OPTS} --save-views-to $(MAKEFILE_DIR)/final --skip KLayout.Antenna --skip KLayout.DRC --skip Magic.DRC --skip KLayout.Density --skip OpenROAD.IRDropReport
 .PHONY: librelane-nodrc
 
 librelane-klayoutdrc: clone-pdk defines ## Run LibreLane flow without magic DRC checks
-	SRAM_DEFINE=${SRAM_DEFINE} librelane ${LIBRELANE_CONFIGS} ${LIBRELANE_OPTS} --save-views-to $(MAKEFILE_DIR)/final --skip Magic.DRC
+	SRAM_DEFINE=${SRAM_DEFINE} SLOT_DEFINE=${SLOT_DEFINE} librelane ${LIBRELANE_CONFIGS} ${LIBRELANE_OPTS} --save-views-to $(MAKEFILE_DIR)/final --skip Magic.DRC
 .PHONY: librelane-klayoutdrc
 
 librelane-magicdrc: clone-pdk defines ## Run LibreLane flow without KLayout DRC checks
-	SRAM_DEFINE=${SRAM_DEFINE} librelane ${LIBRELANE_CONFIGS} ${LIBRELANE_OPTS} --save-views-to $(MAKEFILE_DIR)/final --skip KLayout.DRC
+	SRAM_DEFINE=${SRAM_DEFINE} SLOT_DEFINE=${SLOT_DEFINE} librelane ${LIBRELANE_CONFIGS} ${LIBRELANE_OPTS} --save-views-to $(MAKEFILE_DIR)/final --skip KLayout.DRC
 .PHONY: librelane-magicdrc
 
 librelane-openroad: clone-pdk defines ## Open the last run in OpenROAD
-	SRAM_DEFINE=${SRAM_DEFINE} librelane ${LIBRELANE_CONFIGS} ${LIBRELANE_OPTS} --last-run --flow OpenInOpenROAD
+	SRAM_DEFINE=${SRAM_DEFINE} SLOT_DEFINE=${SLOT_DEFINE} librelane ${LIBRELANE_CONFIGS} ${LIBRELANE_OPTS} --last-run --flow OpenInOpenROAD
 .PHONY: librelane-openroad
 
 librelane-klayout: clone-pdk defines ## Open the last run in KLayout
-	SRAM_DEFINE=${SRAM_DEFINE} librelane ${LIBRELANE_CONFIGS} ${LIBRELANE_OPTS} --last-run --flow OpenInKLayout
+	SRAM_DEFINE=${SRAM_DEFINE} SLOT_DEFINE=${SLOT_DEFINE} librelane ${LIBRELANE_CONFIGS} ${LIBRELANE_OPTS} --last-run --flow OpenInKLayout
 .PHONY: librelane-klayout
 
 librelane-floorplan: clone-pdk defines ## Open the last run in KLayout
-	SRAM_DEFINE=${SRAM_DEFINE} librelane ${LIBRELANE_CONFIGS} ${LIBRELANE_OPTS} --last-run --from OpenROAD.Floorplan
+	SRAM_DEFINE=${SRAM_DEFINE} SLOT_DEFINE=${SLOT_DEFINE} librelane ${LIBRELANE_CONFIGS} ${LIBRELANE_OPTS} --last-run --from OpenROAD.Floorplan
 .PHONY: librelane-floorplan
 
 librelane-pdn: clone-pdk defines ## Open the last run in KLayout
-	SRAM_DEFINE=${SRAM_DEFINE} librelane ${LIBRELANE_CONFIGS} ${LIBRELANE_OPTS} --last-run --from OpenROAD.GeneratePDN
+	SRAM_DEFINE=${SRAM_DEFINE} SLOT_DEFINE=${SLOT_DEFINE} librelane ${LIBRELANE_CONFIGS} ${LIBRELANE_OPTS} --to OpenROAD.GeneratePDN
 .PHONY: librelane-pdn
 
 librelane-timing: clone-pdk defines ## Open the last run in KLayout
-	SRAM_DEFINE=${SRAM_DEFINE} librelane ${LIBRELANE_CONFIGS} ${LIBRELANE_OPTS} --to OpenROAD.STAMidPNR-3
+	SRAM_DEFINE=${SRAM_DEFINE} SLOT_DEFINE=${SLOT_DEFINE} librelane ${LIBRELANE_CONFIGS} ${LIBRELANE_OPTS} --to OpenROAD.STAMidPNR-3
 .PHONY: librelane-timing
 
 librelane-padring: clone-pdk defines ## Only create the padring
