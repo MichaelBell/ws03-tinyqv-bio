@@ -9,80 +9,80 @@ VERILOG_DEFINES: ["SLOT_1X0P5"]
 PAD_SOUTH: [
     clk_pad,
     rst_n_pad,
-    "bidir\\[0\\].pad",
-    "bidir\\[1\\].pad",
+    "bidir\\[0\\].std.pad",
+    "bidir\\[1\\].std.pad",
 
     "dvss_pads\\[0\\].pad",
     "dvdd_pads\\[0\\].pad",
 
-    "bidir\\[2\\].pad",
-    "bidir\\[3\\].pad",
-    "bidir\\[4\\].pad",
-    "bidir\\[5\\].pad",
-    "bidir\\[6\\].pad",
-    "bidir\\[7\\].pad",
-    "bidir\\[8\\].pad",
-    "bidir\\[9\\].pad",
-    "bidir\\[10\\].pad",
-    "bidir\\[11\\].pad",
-    "bidir\\[12\\].pad",
-    "bidir\\[13\\].pad",
+    "bidir\\[2\\].std.pad",
+    "bidir\\[3\\].std.pad",
+    "bidir\\[4\\].std.pad",
+    "bidir\\[5\\].std.pad",
+    "bidir\\[6\\].std.pad",
+    "bidir\\[7\\].std.pad",
+    "bidir\\[8\\].std.pad",
+    "bidir\\[9\\].std.pad",
+    "bidir\\[10\\].std.pad",
+    "bidir\\[11\\].std.pad",
+    "bidir\\[12\\].std.pad",
+    "bidir\\[13\\].std.pad",
 
     "dvss_pads\\[1\\].pad",
     "dvdd_pads\\[1\\].pad",
     
-    "bidir\\[14\\].pad",
-    "bidir\\[15\\].pad",
-    "bidir\\[16\\].pad",
-    "bidir\\[17\\].pad"
+    "bidir\\[14\\].std.pad",
+    "bidir\\[15\\].std.pad",
+    "bidir\\[16\\].std.pad",
+    "bidir\\[17\\].std.pad"
 ]
 
 PAD_EAST: [
     "dvss_pads\\[2\\].pad",
     "dvdd_pads\\[2\\].pad",
 
-    "bidir\\[18\\].pad",
-    "bidir\\[19\\].pad",
-    "bidir\\[20\\].pad",
-    "bidir\\[21\\].pad",
-    "bidir\\[22\\].pad",
-    "bidir\\[23\\].pad",
-    "bidir\\[24\\].pad",
-    "bidir\\[25\\].pad",
+    "bidir\\[18\\].std.pad",
+    "bidir\\[19\\].std.pad",
+    "bidir\\[20\\].std.pad",
+    "bidir\\[21\\].std.pad",
+    "bidir\\[22\\].std.pad",
+    "bidir\\[23\\].std.pad",
+    "bidir\\[24\\].std.pad",
+    "bidir\\[25\\].std.pad",
 
     "dvss_pads\\[3\\].pad",
     "dvdd_pads\\[3\\].pad"
 ]
 
 PAD_NORTH: [
-    "bidir\\[45\\].pad",
-    "bidir\\[44\\].pad",
-    "bidir\\[43\\].pad",
-    "bidir\\[42\\].pad",
+    "bidir\\[45\\].std.pad",
+    "bidir\\[44\\].std.pad",
+    "bidir\\[43\\].usb.pad",
+    "bidir\\[42\\].std.pad",
     
     "dvss_pads\\[5\\].pad",
     "dvdd_pads\\[5\\].pad",
 
-    "bidir\\[41\\].pad",
-    "bidir\\[40\\].pad",
-    "bidir\\[39\\].pad",
-    "bidir\\[38\\].pad",
-    "bidir\\[37\\].pad",
-    "bidir\\[36\\].pad",
-    "bidir\\[35\\].pad",
-    "bidir\\[34\\].pad",
-    "bidir\\[33\\].pad",
-    "bidir\\[32\\].pad",
-    "bidir\\[31\\].pad",
-    "bidir\\[30\\].pad",
+    "bidir\\[41\\].std.pad",
+    "bidir\\[40\\].std.pad",
+    "bidir\\[39\\].std.pad",
+    "bidir\\[38\\].std.pad",
+    "bidir\\[37\\].std.pad",
+    "bidir\\[36\\].std.pad",
+    "bidir\\[35\\].std.pad",
+    "bidir\\[34\\].std.pad",
+    "bidir\\[33\\].std.pad",
+    "bidir\\[32\\].std.pad",
+    "bidir\\[31\\].std.pad",
+    "bidir\\[30\\].std.pad",
 
     "dvss_pads\\[4\\].pad",
     "dvdd_pads\\[4\\].pad",
     
-    "bidir\\[29\\].pad",
-    "bidir\\[28\\].pad",
-    "bidir\\[27\\].pad",
-    "bidir\\[26\\].pad"
+    "bidir\\[29\\].std.pad",
+    "bidir\\[28\\].std.pad",
+    "bidir\\[27\\].std.pad",
+    "bidir\\[26\\].std.pad"
 ]
 
 
@@ -95,10 +95,10 @@ PAD_WEST: [
     "inputs\\[1\\].pad",
     "inputs\\[0\\].pad",
     
-    "bidir\\[49\\].pad",
-    "bidir\\[48\\].pad",
-    "bidir\\[47\\].pad",
-    "bidir\\[46\\].pad",
+    "bidir\\[49\\].std.pad",
+    "bidir\\[48\\].std.pad",
+    "bidir\\[47\\].std.pad",
+    "bidir\\[46\\].std.pad",
     
     "dvss_pads\\[6\\].pad",
     "dvdd_pads\\[6\\].pad"

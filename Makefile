@@ -100,7 +100,7 @@ librelane-condensed: clone-pdk defines ## Run LibreLane flow (synthesis, PnR, ve
 .PHONY: librelane-condensed
 
 librelane-nodrc: clone-pdk defines ## Run LibreLane flow without DRC checks
-	SRAM_DEFINE=${SRAM_DEFINE} librelane ${LIBRELANE_CONFIGS} ${LIBRELANE_OPTS} --save-views-to $(MAKEFILE_DIR)/final --skip KLayout.Antenna --skip KLayout.DRC --skip Magic.DRC --skip KLayout.Density --skip OpenROAD.IRDropReport --to OpenROAD.GlobalPlacement
+	SRAM_DEFINE=${SRAM_DEFINE} librelane ${LIBRELANE_CONFIGS} ${LIBRELANE_OPTS} --save-views-to $(MAKEFILE_DIR)/final --skip KLayout.Antenna --skip KLayout.DRC --skip Magic.DRC --skip KLayout.Density --skip OpenROAD.IRDropReport
 .PHONY: librelane-nodrc
 
 librelane-klayoutdrc: clone-pdk defines ## Run LibreLane flow without magic DRC checks
