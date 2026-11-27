@@ -246,7 +246,7 @@ module tinyQV_top #(
         .user_interrupts(peri_interrupts)
     );
 
-    femto_bio #(.NUM_CORES(`NUM_BIO_CORES)) i_bio (
+    femto_bio #(.NUM_CORES(`NUM_BIO_CORES), .RAM_WIDTH(`BIO_RAM_WIDTH)) i_bio (
         `ifdef USE_POWER_PINS_FOR_RAM
         .VDD  (VDD),
         .VSS  (VSS),

@@ -13,6 +13,7 @@
 `define NUM_ANALOG_PADS 0
 
 `define NUM_BIO_CORES 4
+`define BIO_RAM_WIDTH 11
 
 `endif
 
@@ -31,6 +32,7 @@
 `define NUM_ANALOG_PADS 0
 
 `define NUM_BIO_CORES 3
+`define BIO_RAM_WIDTH 11
 
 `endif
 
@@ -49,6 +51,7 @@
 `define NUM_ANALOG_PADS 0
 
 `define NUM_BIO_CORES 3
+`define BIO_RAM_WIDTH 11
 
 `endif
 
@@ -67,5 +70,6 @@
 `define NUM_ANALOG_PADS 0
 
 `define NUM_BIO_CORES 1
+`define BIO_RAM_WIDTH 10
 
 `endif
