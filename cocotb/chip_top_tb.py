@@ -897,6 +897,8 @@ def chip_top_runner():
         proj_path / "../ip/gf180mcu_ws_ip__qrcode_id/vh/gf180mcu_ws_ip__qrcode_id.v",
         proj_path / "../ip/gf180mcu_ws_ip__shuttle_id/vh/gf180mcu_ws_ip__shuttle_id.v",
         proj_path / "../ip/gf180mcu_ws_ip__project_id/vh/gf180mcu_ws_ip__project_id.v",
+
+        proj_path / "../ip/gf180mcu_tnt_io/gf180mcu_tnt_io__bi_24t_usb.v",
         
         # Testbench
         "tb_top.v"
