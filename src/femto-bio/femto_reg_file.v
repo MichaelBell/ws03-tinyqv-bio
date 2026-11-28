@@ -107,7 +107,8 @@ module femto_reg_file (
     assign rs2 = rdata[rs2_id];
 */
 
-    reg [31:0] registerFile [15:0];
+    reg [31:0] registerFile [15:1];
+    wire [31:0] reg_data [15:0];
 
     generate
     for (genvar i = 1; i < 16; i = i + 1) begin : reg_loop
@@ -118,13 +119,15 @@ module femto_reg_file (
                 registerFile[i] <= rd_wdata;
         end
     end
-    endgenerate
-    always @(*) begin
-        registerFile[0] = 32'b0;
-    end
 
-    assign rs1 = registerFile[rs1_id];
-    assign rs2 = registerFile[rs2_id];
+    assign reg_data[0] = 32'b0;
+    for (genvar i = 1; i < 16; i = i + 1) begin : reg_assign
+        assign reg_data[i] = registerFile[i];
+    end
+    endgenerate
+
+    assign rs1 = reg_data[rs1_id];
+    assign rs2 = reg_data[rs2_id];
 
 `endif
 

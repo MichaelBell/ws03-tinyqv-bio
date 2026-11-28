@@ -467,12 +467,12 @@ async def read_byte(dut, reg, expected_val):
   await stop_nops()
 
 
-#@cocotb.test()
+@cocotb.test()
 async def test_start(dut):
     """Run a simple GPIO test"""
 
     # Create a logger for this testbench
-    logger = logging.getLogger("my_testbench")
+    logger = cocotb.log
 
     logger.info("Startup sequence...")
 
@@ -488,7 +488,14 @@ async def test_start(dut):
     # Check BIO ID
     await send_instr(dut, InstructionLUI(a0, 0x9000).encode())
     await send_instr(dut, InstructionLW(x1, a0, 0x4).encode())
-    assert await read_reg(dut, x1) == 0x08000480
+
+    if slot == "0p5x0p5":
+        bio_config = 0x04000180
+    elif slot == "1x1":
+        bio_config = 0x08000480
+    else:
+        bio_config = 0x08000380
+    assert await read_reg(dut, x1) == bio_config
 
     # Set up GPIO
     await send_instr(dut, InstructionADDI(x1, x0, -1).encode())
@@ -510,12 +517,12 @@ async def test_start(dut):
 
     logger.info("Done!")
 
-#@cocotb.test()
+@cocotb.test()
 async def test_uart(dut):
     """Run a simple UART test"""
 
     # Create a logger for this testbench
-    logger = logging.getLogger("my_testbench")
+    logger = cocotb.log
 
     logger.info("Startup sequence...")
 
@@ -615,16 +622,16 @@ async def test_scratch_memory(dut):
         return instr | (7 << 12)
 
     # Create a logger for this testbench
-    logger = logging.getLogger("my_testbench")
+    logger = cocotb.log
 
     logger.info("Startup sequence...")
 
     # Start up
     await start_up(dut)
 
-    logger.info("Running the Scratch memory test...")
+    RAM_SIZE = 256 if slot == "0p5x0p5" else 512
+    logger.info(f"Running the Scratch memory test for slot {slot}, {RAM_SIZE} bytes...")
 
-    RAM_SIZE = 512
     RAM = [0]*RAM_SIZE
     for i in range(0, RAM_SIZE, 4):
         await send_instr(dut, InstructionADDI(x1, x0, i).encode())
@@ -740,77 +747,164 @@ async def test_scratch_memory(dut):
                 RAM[write_addr + 2] = (write_val >> 16) & 0xff
                 RAM[write_addr + 3] = (write_val >> 24) & 0xff
 
-#@cocotb.test()
+@cocotb.test()
 async def test_bio_core_memory(dut):
     # Create a logger for this testbench
-    logger = logging.getLogger("my_testbench")
+    logger = cocotb.log
 
     logger.info("Startup sequence...")
 
     # Start up
     await start_up(dut)
 
-    logger.info("Running the Scratch memory test...")
+    RAM_SIZE = 1024 if slot == "0p5x0p5" else 2048
+    if slot == "0p5x0p5":
+        CORES = 1
+    elif slot == "1x1":
+        CORES = 4
+    else:
+        CORES = 3
 
-    RAM_SIZE = 2048
-    RAM_BASE = 0x9009000 # Core 0 memory
-    RAM = [0]*RAM_SIZE
-    await send_instr(dut, InstructionLUI(sp, RAM_BASE >> 12).encode())
-    for i in range(0, RAM_SIZE, 4):
-        await send_instr(dut, InstructionLUI(x1, (i >> 12) + ((i >> 11) & 1)).encode())
-        await send_instr(dut, InstructionADDI(x1, x1, (i & 0xfff) - (0x1000 if i & 0x800 else 0)).encode())
-        await send_instr(dut, InstructionSW(sp, x1, i).encode())
-        RAM[i] = i & 0xff
-        RAM[i+1] = i >> 8
+    for core in range(CORES):
+        logger.info(f"Running the BIO memory test, {RAM_SIZE} bytes on core {core}...")
 
-    for i in range(0, RAM_SIZE, 4):
-        await send_instr(dut, InstructionLW(x1, sp, i).encode())
-        assert await read_reg(dut, x1) == i
+        RAM_BASE = 0x9009000 + 0x2000 * core
+        RAM = [0]*RAM_SIZE
+        await send_instr(dut, InstructionLUI(sp, RAM_BASE >> 12).encode())
+        for i in range(0, RAM_SIZE, 4):
+            await send_instr(dut, InstructionLUI(x1, (i >> 12) + ((i >> 11) & 1)).encode())
+            await send_instr(dut, InstructionADDI(x1, x1, (i & 0xfff) - (0x1000 if i & 0x800 else 0)).encode())
+            await send_instr(dut, InstructionSW(sp, x1, i).encode())
+            RAM[i] = i & 0xff
+            RAM[i+1] = i >> 8
 
-    mask = [0xfff, 0xffe, 0xffc]
-    for i in range(20):
-        write_len = 2
-        write_addr = random.randint(0,RAM_SIZE - (1 << write_len)) & mask[write_len]
-        write_val = random.randint(0,0xffffffff)
-        await send_instr(dut, InstructionLUI(x1, (write_val >> 12) + ((write_val >> 11) & 1)).encode())
-        await send_instr(dut, InstructionADDI(x1, x1, (write_val & 0xfff) - (0x1000 if write_val & 0x800 else 0)).encode())
-        await send_instr(dut, InstructionSW(sp, x1, write_addr).encode())
+        for i in range(0, RAM_SIZE, 4):
+            await send_instr(dut, InstructionLW(x1, sp, i).encode())
+            assert await read_reg(dut, x1) == i
 
-        read_len = write_len
-        read_addr = write_addr
-        read_val = write_val
-
-        RAM[write_addr] = write_val & 0xff
-        RAM[write_addr + 1] = (write_val >> 8) & 0xff
-        RAM[write_addr + 2] = (write_val >> 16) & 0xff
-        RAM[write_addr + 3] = (write_val >> 24) & 0xff
-
-        await send_instr(dut, InstructionLW(x1, sp, read_addr).encode())
-        assert await read_reg(dut, x1) == read_val
-
-    for i in range(300):
-        if random.randint(0, 1) == 0:
-            read_len = 2
-            read_addr = random.randint(0,RAM_SIZE - (1 << read_len)) & mask[read_len]
-            await send_instr(dut, InstructionLW(x1, sp, read_addr).encode())
-            read_val = await read_reg(dut, x1)
-            assert (read_val & 0xFF) == RAM[read_addr]
-            assert ((read_val >> 8) & 0xFF) == RAM[read_addr+1]
-            assert ((read_val >> 16) & 0xFF) == RAM[read_addr+2]
-            assert ((read_val >> 24) & 0xFF) == RAM[read_addr+3]
-        else:
+        mask = [0xfff, 0xffe, 0xffc]
+        for i in range(20):
             write_len = 2
             write_addr = random.randint(0,RAM_SIZE - (1 << write_len)) & mask[write_len]
             write_val = random.randint(0,0xffffffff)
             await send_instr(dut, InstructionLUI(x1, (write_val >> 12) + ((write_val >> 11) & 1)).encode())
             await send_instr(dut, InstructionADDI(x1, x1, (write_val & 0xfff) - (0x1000 if write_val & 0x800 else 0)).encode())
             await send_instr(dut, InstructionSW(sp, x1, write_addr).encode())
-            
+
+            read_len = write_len
+            read_addr = write_addr
+            read_val = write_val
+
             RAM[write_addr] = write_val & 0xff
             RAM[write_addr + 1] = (write_val >> 8) & 0xff
             RAM[write_addr + 2] = (write_val >> 16) & 0xff
             RAM[write_addr + 3] = (write_val >> 24) & 0xff
 
+            await send_instr(dut, InstructionLW(x1, sp, read_addr).encode())
+            assert await read_reg(dut, x1) == read_val
+
+        for i in range(300):
+            if random.randint(0, 1) == 0:
+                read_len = 2
+                read_addr = random.randint(0,RAM_SIZE - (1 << read_len)) & mask[read_len]
+                await send_instr(dut, InstructionLW(x1, sp, read_addr).encode())
+                read_val = await read_reg(dut, x1)
+                assert (read_val & 0xFF) == RAM[read_addr]
+                assert ((read_val >> 8) & 0xFF) == RAM[read_addr+1]
+                assert ((read_val >> 16) & 0xFF) == RAM[read_addr+2]
+                assert ((read_val >> 24) & 0xFF) == RAM[read_addr+3]
+            else:
+                write_len = 2
+                write_addr = random.randint(0,RAM_SIZE - (1 << write_len)) & mask[write_len]
+                write_val = random.randint(0,0xffffffff)
+                await send_instr(dut, InstructionLUI(x1, (write_val >> 12) + ((write_val >> 11) & 1)).encode())
+                await send_instr(dut, InstructionADDI(x1, x1, (write_val & 0xfff) - (0x1000 if write_val & 0x800 else 0)).encode())
+                await send_instr(dut, InstructionSW(sp, x1, write_addr).encode())
+                
+                RAM[write_addr] = write_val & 0xff
+                RAM[write_addr + 1] = (write_val >> 8) & 0xff
+                RAM[write_addr + 2] = (write_val >> 16) & 0xff
+                RAM[write_addr + 3] = (write_val >> 24) & 0xff
+
+async def load_bio_program(dut, addr, hex_file):
+    await load_val(dut, sp, 0x9000000 + addr)
+    addr = 0
+    even = False
+    with open("../" + hex_file, "r") as f:
+        for line in f:
+            if even:
+                data = data | (int(line.strip(), 16) << 16)
+                await load_val(dut, a0, data)
+                await send_instr(dut, InstructionSW(sp, a0, addr).encode())  # apb_write(dut, addr, data, 2)
+                addr += 4
+            else:
+                data = int(line.strip(), 16)
+            even = not even
+
+@cocotb.test()
+async def test_uart_tx_program(dut):
+    # Create a logger for this testbench
+    logger = cocotb.log
+
+    logger.info("Startup sequence...")
+
+    # Start up
+    await start_up(dut)
+
+    RAM_SIZE = 256 if slot == "0p5x0p5" else 512
+    logger.info(f"Running the Scratch memory test for slot {slot}, {RAM_SIZE} bytes...")
+
+    # Load UART TX program into core 0
+    await load_bio_program(dut, 0x9000, "uart_tx.hex")
+
+    await load_val(dut, sp, 0x9000000)
+
+    # Set GPIO 3 to BIO
+    await send_instr(dut, InstructionADDI(a0, x0, 0x8).encode())
+    await send_instr(dut, InstructionSW(tp, a0, 0x34).encode())
+
+    # Set quantum for core 0 to 115200 baud assuming 48MHz clock
+    await load_val(dut, a0, ((48_000_000 * 256) // 115200) << 8)
+    await send_instr(dut, InstructionSW(sp, a0, 0x50).encode())
+
+    # Start core 0
+    await send_instr(dut, InstructionADDI(a0, x0, 1).encode())
+    await send_instr(dut, InstructionSW(sp, a0, 0x0).encode())
+
+    # Wait for GPIO 3 to go high
+    await start_nops(dut)
+    for _ in range(200):
+        await ClockCycles(dut.clk_PAD, 1)
+        if dut.gpio_out.value[3] == 1:  # GPIO 3 corresponds to bit 3
+            break
+    else:
+        assert False, "Timeout waiting for GPIO 3 to go high"
+    await stop_nops()
+
+    # Push data to UART TX FIFO
+    uart_byte = 0x5A
+    await send_instr(dut, InstructionADDI(a0, x0, uart_byte).encode())
+    await send_instr(dut, InstructionSW(sp, a0, 0x10).encode())
+
+    # Wait for GPIO 3 to go low
+    await start_nops(dut)
+    for _ in range(1000):
+        await ClockCycles(dut.clk_PAD, 1)
+        if dut.gpio_out.value[3] == 0:  # GPIO 3 corresponds to bit 3
+            break
+    else:
+        assert False, "Timeout waiting for GPIO 3 to go low"
+
+    # Expect UART TX to transmit the byte 0x5A
+    bit_time = 8680
+    await Timer(bit_time / 2, "ns")
+    assert dut.gpio_out.value[3] == 0
+    for i in range(8):
+        await Timer(bit_time, "ns")
+        assert dut.gpio_out.value[3] == (uart_byte & 1)
+        uart_byte >>= 1
+    await Timer(bit_time, "ns")
+    assert dut.gpio_out.value[3] == 1
 
 def chip_top_runner():
 
