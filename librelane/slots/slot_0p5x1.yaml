@@ -227,20 +227,20 @@ MACROS:
     instances:
       # Make sure to specify the SRAMs in pdn_cfg.tcl
       "i_chip_core.tt.i_bio.cores[0].i_femto_bio_core.i_femtoram.i_ram.ram1024.sram_0":
-        location: [969, 1490]
+        location: [969, 450]
         orientation: E
       "i_chip_core.tt.i_bio.cores[0].i_femto_bio_core.i_femtoram.i_ram.ram1024.sram_1":
-        location: [969, 1800]
+        location: [969, 760]
         orientation: E
       "i_chip_core.tt.i_bio.cores[1].i_femto_bio_core.i_femtoram.i_ram.ram1024.sram_0":
-        location: [969, 2490]
+        location: [969, 2970]
         orientation: E
       "i_chip_core.tt.i_bio.cores[1].i_femto_bio_core.i_femtoram.i_ram.ram1024.sram_1":
-        location: [969, 2800]
+        location: [969, 3280]
         orientation: E
       "i_chip_core.tt.i_bio.cores[2].i_femto_bio_core.i_femtoram.i_ram.ram1024.sram_0":
-        location: [969, 3490]
+        location: [969, 3590]
         orientation: E
       "i_chip_core.tt.i_bio.cores[2].i_femto_bio_core.i_femtoram.i_ram.ram1024.sram_1":
-        location: [969, 3800]
+        location: [969, 3900]
         orientation: E
