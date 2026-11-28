@@ -888,6 +888,7 @@ def chip_top_runner():
         Path(pdk_root) / pdk / f"libs.ref/{pad}/verilog/{pad}.v",
         
         # SRAM macros
+        Path(pdk_root) / pdk / f"libs.ref/{sram}/verilog/{sram}__sram256x8m8wm1.v",
         Path(pdk_root) / pdk / f"libs.ref/{sram}/verilog/{sram}__sram512x8m8wm1.v",
         Path(pdk_root) / pdk / f"libs.ref/{sram}/verilog/{sram}__sram1024x8m8wm1.v",
         
